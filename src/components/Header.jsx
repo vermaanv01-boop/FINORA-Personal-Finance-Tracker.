@@ -6,10 +6,10 @@ import {
   Menu, 
   ChevronDown,
   Download,
-  Filter
+  Plus
 } from 'lucide-react';
 
-export default function Header({ onMenuClick, activeTab }) {
+export default function Header({ onMenuClick, activeTab, onOpenAddModal }) {
   const tabTitles = {
     dashboard: 'Financial Dashboard',
     transactions: 'Transaction Ledger',
@@ -46,7 +46,7 @@ export default function Header({ onMenuClick, activeTab }) {
               <Calendar className="w-3.5 h-3.5 text-[#A05C6E]" />
               <span>{currentDate}</span>
               <span className="hidden sm:inline-block text-[#C2B5A5]">•</span>
-              <span className="hidden sm:inline-block text-[#82324C] font-semibold">USD Currency Base</span>
+              <span className="hidden sm:inline-block text-[#82324C] font-semibold">USD Base</span>
             </div>
           </div>
         </div>
@@ -65,6 +65,16 @@ export default function Header({ onMenuClick, activeTab }) {
 
         {/* Right Section: Action tools & Profile */}
         <div className="flex items-center gap-2.5 sm:gap-3">
+          {/* Quick Add Transaction Button */}
+          <button 
+            onClick={onOpenAddModal}
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-[#DFB27A] to-[#E89BA8] text-[#230811] hover:opacity-95 transition-all shadow-md active:scale-95"
+            title="Record New Transaction"
+          >
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">Add Entry</span>
+          </button>
+
           {/* Quick statement download button */}
           <button 
             className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl bg-white border border-[#E6D9CB] text-[#2D0B16] hover:bg-[#F7F3EB] transition-all shadow-xs"
@@ -103,4 +113,3 @@ export default function Header({ onMenuClick, activeTab }) {
     </header>
   );
 }
-
