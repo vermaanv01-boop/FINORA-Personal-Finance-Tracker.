@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { 
-  RotateCcw, 
+  Trash2, 
   Save, 
   Check,
   DollarSign,
   Bell,
-  Sparkles
+  Sparkles,
+  AlertTriangle
 } from 'lucide-react';
 import { CURRENCIES, formatCurrency } from '../utils/currency';
 import { useTheme } from '../context/ThemeContext';
@@ -13,23 +14,32 @@ import { useTheme } from '../context/ThemeContext';
 export default function SettingsView({ 
   settings, 
   updateSettings, 
-  resetToDefault 
+  clearAllTransactions 
 }) {
   const { isDark } = useTheme();
   const [currency, setCurrency] = useState(settings?.currency || 'INR');
-  const [budgetLimit, setBudgetLimit] = useState(settings?.monthlyBudgetLimit || 175000);
+  const [budgetLimit, setBudgetLimit] = useState(settings?.monthlyBudgetLimit || 100000);
   const [emailAlerts, setEmailAlerts] = useState(settings?.emailAlerts ?? true);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [clearedSuccess, setClearedSuccess] = useState(false);
 
   const handleSave = (e) => {
     e.preventDefault();
     updateSettings({
       currency,
-      monthlyBudgetLimit: Number(budgetLimit) || 175000,
+      monthlyBudgetLimit: Number(budgetLimit) || 100000,
       emailAlerts
     });
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2500);
+  };
+
+  const handleClear = () => {
+    if (window.confirm('Are you sure you want to delete all transactions for your account? This action cannot be undone.')) {
+      clearAllTransactions();
+      setClearedSuccess(true);
+      setTimeout(() => setClearedSuccess(false), 2500);
+    }
   };
 
   return (
@@ -48,7 +58,7 @@ export default function SettingsView({
         </div>
         <h2 className="font-serif text-2xl font-bold">Preferences & Currency Setup</h2>
         <p className="text-xs opacity-80 mt-1">
-          Configure default reporting currency (INR ₹ by default), monthly budget caps, notifications, and reset demo data in White & Burgundy design.
+          Configure default reporting currency, monthly budget caps, notifications, and manage account ledger data.
         </p>
       </div>
 
@@ -60,6 +70,13 @@ export default function SettingsView({
         }`}>
           <Check className="w-4 h-4" />
           <span>Preferences saved successfully to LocalStorage. Live calculations updated!</span>
+        </div>
+      )}
+
+      {clearedSuccess && (
+        <div className="p-3.5 rounded-xl border border-red-500 bg-red-950/40 text-red-300 text-xs font-semibold flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4" />
+          <span>All account transactions have been cleared. Dashboard is reset to zero.</span>
         </div>
       )}
 
@@ -146,13 +163,12 @@ export default function SettingsView({
         <div className={`pt-5 border-t flex flex-wrap items-center justify-between gap-3 ${isDark ? 'border-[#360B1C]' : 'border-[#E8E2E4]'}`}>
           <button
             type="button"
-            onClick={resetToDefault}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs transition-colors cursor-pointer ${
-              isDark ? 'bg-[#360B1C] border-[#52152C] text-[#FFFFFF] hover:bg-[#4A1025]' : 'bg-[#F8F7F7] border-[#E8E2E4] text-[#4A1025] hover:bg-[#FFFFFF]'
-            }`}
+            onClick={handleClear}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-500/40 text-xs text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+            title="Clear all transactions in this account"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Restore Default INR Dataset</span>
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Clear Account Transactions</span>
           </button>
 
           <button

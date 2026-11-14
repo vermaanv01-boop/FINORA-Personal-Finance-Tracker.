@@ -9,8 +9,7 @@ export default function SettingsPage() {
     <SettingsView 
       settings={finance.settings}
       updateSettings={finance.updateSettings}
-      resetToDefault={finance.resetToDefault}
+      clearAllTransactions={finance.clearAllTransactions}
     />
   );
 }
-
