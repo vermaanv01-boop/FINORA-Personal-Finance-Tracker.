@@ -14,9 +14,8 @@ import {
   Wallet,
   ArrowUpRight,
   ArrowDownLeft,
-  Lock,
-  Layers,
-  Activity
+  Activity,
+  Layers
 } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import { useAuth } from '../context/AuthContext';
@@ -34,12 +33,9 @@ export default function LandingPage() {
   const [sequenceStep, setSequenceStep] = useState(0);
 
   useEffect(() => {
-    // Initial mount: Step 1 (floating center preview card)
     const t1 = setTimeout(() => setSequenceStep(1), 100);
-    // Step 2: Transition into showcase layout, move to right
-    const t2 = setTimeout(() => setSequenceStep(2), 700);
-    // Step 3: Stagger headline & CTAs
-    const t3 = setTimeout(() => setSequenceStep(3), 1100);
+    const t2 = setTimeout(() => setSequenceStep(2), 650);
+    const t3 = setTimeout(() => setSequenceStep(3), 1000);
 
     return () => {
       clearTimeout(t1);
@@ -64,7 +60,7 @@ export default function LandingPage() {
           }
         });
       },
-      { threshold: 0.15, rootMargin: '0px 0px -50px 0px' }
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
     );
 
     Object.values(sectionRefs.current).forEach((el) => {
@@ -81,23 +77,23 @@ export default function LandingPage() {
   const features = [
     {
       icon: ReceiptText,
-      title: 'Real-Time Transaction Intelligence',
-      desc: 'Seamlessly capture, reconcile and organize every debit and credit across your executive accounts with zero delay.'
+      title: 'Expense Tracking',
+      desc: 'Seamlessly capture, organize and audit every financial transaction across your personal and executive accounts.'
     },
     {
       icon: BarChart3,
-      title: 'Precision Spending Analytics',
-      desc: 'Deep multi-quarter cash flow analytics with dynamic budget thresholds and surplus retention tracking.'
+      title: 'Financial Analytics',
+      desc: 'Understand your spending with dynamic outflow patterns, net savings efficiency, and month-over-month variances.'
     },
     {
       icon: PieChart,
-      title: 'Disciplined Budget Allocation',
-      desc: 'Maintain optimal portfolio distribution across essential living costs, discretionary luxury and automated investments.'
+      title: 'Budget Allocation',
+      desc: 'Set custom spending envelopes to keep fixed expenses, discretionary lifestyle and strategic investments balanced.'
     },
     {
       icon: IndianRupee,
-      title: 'Native INR (₹) Architecture',
-      desc: 'Engineered from the ground up for Indian numbering (Lakhs & Crores), perfectly formatted for high-net-worth clarity.'
+      title: 'Native INR (₹) Formatting',
+      desc: 'Designed for precision Indian number notation (Lakhs & Crores) with seamless multi-currency configuration support.'
     }
   ];
 
@@ -189,14 +185,12 @@ export default function LandingPage() {
 
       {/* HERO SECTION WITH CINEMATIC OPENING SEQUENCE */}
       <section className="relative overflow-hidden pt-8 pb-20 sm:pt-16 sm:pb-28 px-4 sm:px-8">
-        {/* Subtle background glow */}
         <div className={`
           absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full blur-3xl pointer-events-none opacity-20
           ${isDark ? 'bg-[#4A1025]' : 'bg-[#4A1025]/10'}
         `} />
 
         <div className="max-w-7xl mx-auto">
-          {/* Main Hero Showcase Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
             {/* Left Column: Headlines & CTA (Reveals smoothly) */}
@@ -212,7 +206,7 @@ export default function LandingPage() {
                 }
               `}>
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Next-Gen Personal Finance Intelligence</span>
+                <span>Personal Finance Tracker</span>
               </div>
 
               <h1 className={`
@@ -241,7 +235,7 @@ export default function LandingPage() {
                 <NavLink
                   to="/signup"
                   className={`
-                    px-7 py-3.5 rounded-xl text-xs font-bold transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95
+                    px-7 py-3.5 rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 active:scale-95
                     ${isDark 
                       ? 'bg-[#FFFFFF] text-[#260814] hover:bg-[#F8F7F7]' 
                       : 'bg-[#4A1025] text-[#FFFFFF] hover:bg-[#5E142F]'
@@ -266,22 +260,22 @@ export default function LandingPage() {
                 </NavLink>
               </div>
 
-              {/* Quick trust checklist */}
+              {/* Trust checklist */}
               <div className={`
                 mt-8 pt-6 border-t flex flex-wrap gap-4 text-xs font-medium
                 ${isDark ? 'border-[#360B1C] text-[#FFFFFF]/60' : 'border-[#E8E2E4] text-[#260814]/70'}
               `}>
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#4A1025] dark:text-[#FFFFFF]" />
-                  Zero Third-Party APIs
+                  Zero Fabricated Data
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#4A1025] dark:text-[#FFFFFF]" />
-                  INR (₹) Lakh/Crore Notation
+                  Indian Rupee (₹) Default
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#4A1025] dark:text-[#FFFFFF]" />
-                  Full Local Persistence
+                  Isolated Per-User Storage
                 </span>
               </div>
             </div>
@@ -306,58 +300,57 @@ export default function LandingPage() {
                     <span className="w-2.5 h-2.5 rounded-full bg-[#FFFFFF]" />
                     <span className="w-2.5 h-2.5 rounded-full bg-[#FFFFFF]/60" />
                     <span className="w-2.5 h-2.5 rounded-full bg-[#FFFFFF]/30" />
-                    <span className="font-mono text-[11px] text-[#FFFFFF]/70 ml-2">finora.live.preview</span>
+                    <span className="font-mono text-[11px] text-[#FFFFFF]/70 ml-2">finora.architecture.preview</span>
                   </div>
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FFFFFF] text-[#260814]">
-                    ₹ INR Base Active
+                    Interface Showcase
                   </span>
                 </div>
 
-                {/* Dashboard Showcase Mockup */}
+                {/* Dashboard Showcase Mockup (Clean Architectural Layout) */}
                 <div className="pt-5 space-y-4 text-left">
-                  {/* Top 3 KPI pill cards */}
+                  {/* KPI cards layout preview */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="p-3.5 rounded-xl bg-[#260814]/90 border border-[#4A1025] text-left">
                       <span className="text-[10px] text-[#FFFFFF]/70 uppercase font-semibold">Total Balance</span>
-                      <p className="font-serif text-lg font-bold text-[#FFFFFF] mt-0.5">₹1,95,000.00</p>
-                      <span className="text-[10px] text-[#FFFFFF]/90 font-medium">+14.8% net liquid</span>
+                      <p className="font-serif text-base font-bold text-[#FFFFFF] mt-1">Calculated Live</p>
+                      <span className="text-[10px] text-[#FFFFFF]/80 font-medium">Inflows - Outflows</span>
                     </div>
                     <div className="p-3.5 rounded-xl bg-[#260814]/90 border border-[#4A1025] text-left">
                       <span className="text-[10px] text-[#FFFFFF]/70 uppercase font-semibold">Total Inflow</span>
-                      <p className="font-serif text-lg font-bold text-[#FFFFFF] mt-0.5">₹3,35,300.00</p>
-                      <span className="text-[10px] text-[#FFFFFF]/80 font-medium">Executive Inflow</span>
+                      <p className="font-serif text-base font-bold text-[#FFFFFF] mt-1">Income Tracker</p>
+                      <span className="text-[10px] text-[#FFFFFF]/80 font-medium">Verified Credits</span>
                     </div>
                     <div className="p-3.5 rounded-xl bg-[#260814]/90 border border-[#4A1025] text-left">
                       <span className="text-[10px] text-[#FFFFFF]/70 uppercase font-semibold">Net Savings Rate</span>
-                      <p className="font-serif text-lg font-bold text-[#FFFFFF] mt-0.5">58.2%</p>
-                      <span className="text-[10px] text-[#FFFFFF]/90 font-medium">Optimal Margin</span>
+                      <p className="font-serif text-base font-bold text-[#FFFFFF] mt-1">Retention %</p>
+                      <span className="text-[10px] text-[#FFFFFF]/80 font-medium">Auto-Calculated</span>
                     </div>
                   </div>
 
-                  {/* Mock Interactive Graph Bars */}
+                  {/* Visual Chart Architecture Preview */}
                   <div className="p-4 rounded-2xl bg-[#260814]/90 border border-[#4A1025]">
                     <div className="flex items-center justify-between text-xs mb-3">
                       <div>
                         <p className="font-serif font-bold text-[#FFFFFF] text-sm">Monthly Expenditure Velocity</p>
                         <p className="text-[11px] text-[#FFFFFF]/60">Comparative inflow vs outflow trajectory</p>
                       </div>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-[#4A1025] text-[#FFFFFF] font-mono">Q4 Reconciled</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-[#4A1025] text-[#FFFFFF] font-mono">Dynamic Recharts</span>
                     </div>
 
-                    {/* Stylized CSS Bar chart simulation */}
+                    {/* Architectural Preview Bars */}
                     <div className="h-28 flex items-end justify-between gap-2 pt-2 px-2 border-b border-[#4A1025]">
                       {[
-                        { m: 'Jun', h1: '60%', h2: '35%' },
-                        { m: 'Jul', h1: '75%', h2: '45%' },
-                        { m: 'Aug', h1: '80%', h2: '40%' },
-                        { m: 'Sep', h1: '85%', h2: '38%' },
-                        { m: 'Oct', h1: '90%', h2: '50%' },
-                        { m: 'Nov', h1: '100%', h2: '55%' }
-                      ].map((bar, i) => (
+                        { m: 'Period 1', h1: '45%', h2: '30%' },
+                        { m: 'Period 2', h1: '65%', h2: '40%' },
+                        { m: 'Period 3', h1: '75%', h2: '45%' },
+                        { m: 'Period 4', h1: '85%', h2: '50%' },
+                        { m: 'Period 5', h1: '95%', h2: '55%' }
+                      ].map((bar) => (
                         <div key={bar.m} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                           <div className="w-full flex items-end justify-center gap-1 h-full">
-                            <div className="w-3 bg-[#FFFFFF] rounded-t-sm" style={{ height: bar.h1 }} title="Inflow" />
-                            <div className="w-3 bg-[#4A1025] border border-[#FFFFFF]/40 rounded-t-sm" style={{ height: bar.h2 }} title="Outflow" />
+                            <div className="w-3 bg-[#FFFFFF] rounded-t-sm" style={{ height: bar.h1 }} />
+                            <div className="w-3 bg-[#4A1025] border border-[#FFFFFF]/40 rounded-t-sm" style={{ height: bar.h2 }} />
                           </div>
                           <span className="text-[10px] text-[#FFFFFF]/60 font-mono">{bar.m}</span>
                         </div>
@@ -373,22 +366,22 @@ export default function LandingPage() {
                           <span className="w-2.5 h-2.5 rounded-sm bg-[#4A1025] border border-[#FFFFFF]/50" /> Outflow
                         </span>
                       </div>
-                      <span className="text-[#FFFFFF] font-mono font-semibold">+2.4x Inflow Multiple</span>
+                      <span className="text-[#FFFFFF] font-mono font-semibold">Real-Time Sync</span>
                     </div>
                   </div>
 
-                  {/* Mock live transaction strip */}
+                  {/* Feature strip */}
                   <div className="p-3 rounded-xl bg-[#260814]/90 border border-[#4A1025] flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2.5">
                       <div className="w-7 h-7 rounded-lg bg-[#FFFFFF] text-[#260814] flex items-center justify-center font-bold">
-                        <ArrowDownLeft className="w-4 h-4" />
+                        <Activity className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="font-semibold text-[#FFFFFF] text-xs leading-tight">Client Retainer Inflow</p>
-                        <p className="text-[10px] text-[#FFFFFF]/60">Consulting Fee • Cleared</p>
+                        <p className="font-semibold text-[#FFFFFF] text-xs leading-tight">Zero Hardcoded Financials</p>
+                        <p className="text-[10px] text-[#FFFFFF]/60">Your metrics calculate from your own entries</p>
                       </div>
                     </div>
-                    <span className="font-mono font-bold text-sm text-[#FFFFFF]">+₹1,75,000.00</span>
+                    <span className="font-mono text-xs text-[#FFFFFF]">Ready for setup</span>
                   </div>
                 </div>
               </div>
@@ -417,7 +410,7 @@ export default function LandingPage() {
               Comprehensive Financial Suite
             </span>
             <h2 className={`font-serif text-3xl sm:text-4xl font-bold mt-2 ${isDark ? 'text-[#FFFFFF]' : 'text-[#260814]'}`}>
-              Built for Precision & Complete Discretion
+              Expense Tracking & Spending Analytics
             </h2>
             <p className={`text-xs sm:text-sm mt-3 ${isDark ? 'text-[#FFFFFF]/70' : 'text-[#260814]/75'}`}>
               Every module within FINORA works synchronously to maintain an accurate ledger and actionable wealth intelligence.
@@ -431,7 +424,7 @@ export default function LandingPage() {
                 <div 
                   key={f.title}
                   className={`
-                    p-6 rounded-2xl border shadow-lg transition-all duration-300 hover:-translate-y-1 group
+                    p-6 rounded-2xl border shadow-sm transition-all duration-300 hover:-translate-y-1 group
                     ${isDark 
                       ? 'bg-[#360B1C] border-[#52152C] hover:border-[#FFFFFF]/40' 
                       : 'bg-[#FFFFFF] border-[#E8E2E4] hover:border-[#4A1025]'
@@ -440,7 +433,7 @@ export default function LandingPage() {
                   style={{ transitionDelay: `${i * 100}ms` }}
                 >
                   <div className={`
-                    w-12 h-12 rounded-xl flex items-center justify-center mb-5 shadow-sm transition-transform group-hover:scale-105
+                    w-12 h-12 rounded-xl flex items-center justify-center mb-5 shadow-xs transition-transform group-hover:scale-105
                     ${isDark 
                       ? 'bg-[#FFFFFF] text-[#260814]' 
                       : 'bg-[#4A1025] text-[#FFFFFF]'
@@ -461,7 +454,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* SECTION 3: PRODUCT SHOWCASE & PARALLAX FLOATING CARDS */}
+      {/* SECTION 3: PRODUCT SHOWCASE */}
       <section 
         ref={registerSection('showcase')}
         data-section="showcase"
@@ -473,15 +466,15 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
-            <div className="lg:col-span-5 text-left">
+            <div className="lg:col-span-6 text-left">
               <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-[#FFFFFF]' : 'text-[#4A1025]'}`}>
                 Unified Financial Ledger
               </span>
               <h2 className={`font-serif text-3xl sm:text-4xl font-bold mt-2 mb-4 ${isDark ? 'text-[#FFFFFF]' : 'text-[#260814]'}`}>
-                Every Rupee Accounted For, Instantly Reconciled
+                Every Transaction Accounted For, Instantly Reconciled
               </h2>
               <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${isDark ? 'text-[#FFFFFF]/75' : 'text-[#260814]/75'}`}>
-                Record new transactions in seconds. Whether posting executive consulting retainers, index fund SIPs, or apartment leases, FINORA updates your KPIs, category charts, and burn-rate benchmarks without refreshing.
+                Record new transactions in seconds. Whether posting consulting fees, investments, or household expenses, FINORA updates your KPIs, category charts, and budget benchmarks without refreshing.
               </p>
 
               <div className="space-y-3 mb-6">
@@ -496,7 +489,7 @@ export default function LandingPage() {
               </div>
 
               <NavLink
-                to="/transactions"
+                to="/signup"
                 className={`
                   inline-flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-bold transition-all shadow-md active:scale-95
                   ${isDark 
@@ -505,48 +498,30 @@ export default function LandingPage() {
                   }
                 `}
               >
-                <span>Open Transaction Ledger</span>
+                <span>Create Your Ledger</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </NavLink>
             </div>
 
-            {/* Visual preview */}
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-6">
               <div className={`
-                p-6 rounded-3xl border shadow-xl space-y-4
+                p-6 rounded-3xl border shadow-xl space-y-4 text-center
                 ${isDark 
                   ? 'bg-[#360B1C] border-[#52152C]' 
                   : 'bg-[#260814] border-[#4A1025] text-[#FFFFFF]'
                 }
               `}>
-                <div className="flex items-center justify-between pb-3 border-b border-[#4A1025] text-xs">
-                  <span className="font-serif font-bold text-sm text-[#FFFFFF]">Recent Transaction Stream</span>
-                  <span className="text-[11px] text-[#FFFFFF]/70">Auto-Audited</span>
+                <div className="w-12 h-12 rounded-2xl bg-[#FFFFFF] text-[#260814] flex items-center justify-center mx-auto mb-2">
+                  <Wallet className="w-6 h-6" />
                 </div>
-
-                <div className="space-y-2.5">
-                  {[
-                    { title: 'Client Retainer - Executive Advisory', cat: 'Consulting Income', amt: '+₹1,75,000.00', isInc: true },
-                    { title: 'Prestige Meridian Luxury Apartment Rent', cat: 'Housing & Rent', amt: '-₹45,000.00', isInc: false },
-                    { title: 'Nifty 50 Index Fund SIP', cat: 'Investments', amt: '-₹35,000.00', isInc: false },
-                    { title: 'TCS & Infosys Portfolio Dividend', cat: 'Dividend & Yield', amt: '+₹24,500.00', isInc: true }
-                  ].map((tx) => (
-                    <div 
-                      key={tx.title}
-                      className="p-3 rounded-xl bg-[#260814] border border-[#4A1025] flex items-center justify-between text-xs"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold ${tx.isInc ? 'bg-[#FFFFFF] text-[#260814]' : 'bg-[#4A1025] text-[#FFFFFF]'}`}>
-                          {tx.isInc ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
-                        </div>
-                        <div className="text-left">
-                          <p className="font-semibold text-[#FFFFFF] leading-tight">{tx.title}</p>
-                          <p className="text-[10px] text-[#FFFFFF]/60">{tx.cat}</p>
-                        </div>
-                      </div>
-                      <span className="font-mono font-bold text-[#FFFFFF]">{tx.amt}</span>
-                    </div>
-                  ))}
+                <h3 className="font-serif font-bold text-lg text-[#FFFFFF]">Private, Clean & Independent</h3>
+                <p className="text-xs text-[#FFFFFF]/75 max-w-md mx-auto leading-relaxed">
+                  FINORA creates a completely separate financial record for each registered account. Your transactions, categories and preferences remain securely stored in your browser.
+                </p>
+                <div className="pt-2">
+                  <span className="inline-block text-[11px] font-semibold px-3 py-1 rounded-full bg-[#FFFFFF]/10 border border-[#FFFFFF]/20 text-[#FFFFFF]">
+                    100% Client-Side LocalStorage
+                  </span>
                 </div>
               </div>
             </div>
@@ -577,7 +552,7 @@ export default function LandingPage() {
               Master Your Financial Future Today.
             </h2>
             <p className="max-w-xl mx-auto text-xs sm:text-sm text-[#FFFFFF]/80 leading-relaxed mb-8">
-              Experience the clarity of an executive personal wealth intelligence platform. Zero setup required, completely client-side.
+              Experience the clarity of a personal wealth intelligence platform. Zero setup required, completely client-side.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -593,7 +568,7 @@ export default function LandingPage() {
                 to="/login"
                 className="w-full sm:w-auto px-8 py-3.5 rounded-xl border border-[#FFFFFF]/40 text-[#FFFFFF] font-semibold text-xs hover:bg-[#FFFFFF]/10 transition-all flex items-center justify-center"
               >
-                <span>Sign In Demo</span>
+                <span>Sign In</span>
               </NavLink>
             </div>
           </div>
@@ -630,7 +605,7 @@ export default function LandingPage() {
             <NavLink to="/dashboard" className="hover:underline">Dashboard</NavLink>
             <NavLink to="/transactions" className="hover:underline">Transactions</NavLink>
             <NavLink to="/analytics" className="hover:underline">Analytics</NavLink>
-            <NavLink to="/settings" className="hover:underline">Settings</NavLink>
+            <NavLink to="/login" className="hover:underline">Sign In</NavLink>
           </div>
 
           <p className="text-[11px]">
