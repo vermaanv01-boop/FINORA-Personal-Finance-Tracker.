@@ -4,13 +4,11 @@ import {
   PlusCircle, 
   ArrowUpRight, 
   ArrowDownLeft, 
-  Calendar, 
-  CreditCard, 
-  Tag, 
   Check,
   Edit3
 } from 'lucide-react';
 import { CURRENCIES } from '../utils/currency';
+import { useTheme } from '../context/ThemeContext';
 
 const CATEGORY_OPTIONS = [
   'Housing & Rent',
@@ -27,11 +25,11 @@ const CATEGORY_OPTIONS = [
 ];
 
 const ACCOUNT_OPTIONS = [
-  'HDFC Imperia •• 4910',
-  'Infinia Metal •• 8842',
-  'Zerodha Demat •• 8821',
-  'ICICI Wealth •• 3011',
-  'SBI Premier Savings •• 9022',
+  'Private Banking •• 4910',
+  'Burgundy Signature •• 8842',
+  'Wealth Demat •• 8821',
+  'Wealth Reserve •• 3011',
+  'High-Yield Savings •• 9022',
   'Cash Reserve'
 ];
 
@@ -42,12 +40,14 @@ export default function TransactionModal({
   editingTransaction = null,
   currency = 'INR'
 }) {
+  const { isDark } = useTheme();
+
   const [formData, setFormData] = useState({
     title: '',
     amount: '',
     type: 'expense',
     category: 'Food & Dining',
-    account: 'HDFC Imperia •• 4910',
+    account: 'Private Banking •• 4910',
     date: new Date().toISOString().split('T')[0],
     notes: ''
   });
@@ -61,7 +61,7 @@ export default function TransactionModal({
         amount: editingTransaction.amount?.toString() || '',
         type: editingTransaction.type || 'expense',
         category: editingTransaction.category || 'Food & Dining',
-        account: editingTransaction.account || 'HDFC Imperia •• 4910',
+        account: editingTransaction.account || 'Private Banking •• 4910',
         date: editingTransaction.date?.slice(0, 10) || new Date().toISOString().split('T')[0],
         notes: editingTransaction.notes || ''
       });
@@ -71,7 +71,7 @@ export default function TransactionModal({
         amount: '',
         type: 'expense',
         category: 'Food & Dining',
-        account: 'HDFC Imperia •• 4910',
+        account: 'Private Banking •• 4910',
         date: new Date().toISOString().split('T')[0],
         notes: ''
       });
@@ -131,29 +131,35 @@ export default function TransactionModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#120308]/75 backdrop-blur-xs transition-opacity animate-in fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs transition-opacity animate-in fade-in">
       <div 
-        className="w-full max-w-lg bg-[#230811] border border-[#441624] rounded-2xl shadow-2xl overflow-hidden text-[#FDFBF7]"
+        className={`w-full max-w-lg border rounded-2xl shadow-2xl overflow-hidden transition-all ${
+          isDark ? 'bg-[#260814] border-[#360B1C] text-[#FFFFFF]' : 'bg-[#FFFFFF] border-[#E8E2E4] text-[#260814]'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="px-6 py-5 border-b border-[#3E1421] flex items-center justify-between bg-gradient-to-r from-[#2D0B16] to-[#1C060D]">
+        <div className={`px-6 py-5 border-b flex items-center justify-between ${
+          isDark ? 'bg-[#360B1C] border-[#52152C]' : 'bg-[#4A1025] text-[#FFFFFF] border-[#5E142F]'
+        }`}>
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#DFB27A] to-[#E89BA8] flex items-center justify-center text-[#230811]">
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+              isDark ? 'bg-[#FFFFFF] text-[#260814]' : 'bg-[#FFFFFF] text-[#4A1025]'
+            }`}>
               {editingTransaction ? <Edit3 className="w-4 h-4 font-bold" /> : <PlusCircle className="w-4 h-4 font-bold" />}
             </div>
             <div>
-              <h3 className="font-serif font-bold text-lg leading-tight">
+              <h3 className="font-serif font-bold text-lg leading-tight text-[#FFFFFF]">
                 {editingTransaction ? 'Edit Transaction' : 'Record Transaction'}
               </h3>
-              <p className="text-[11px] text-[#E89BA8]/70">
+              <p className="text-[11px] text-[#FFFFFF]/70">
                 {editingTransaction ? `Updating entry ${editingTransaction.id}` : 'Enter transaction details to update ledger & charts'}
               </p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#A89299] hover:text-white hover:bg-[#3D1220] transition-colors"
+            className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -162,59 +168,61 @@ export default function TransactionModal({
         {/* Modal Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Type Selector (Income vs Expense) */}
-          <div className="grid grid-cols-2 gap-3 p-1 rounded-xl bg-[#1A050D] border border-[#37121F]">
+          <div className={`grid grid-cols-2 gap-3 p-1 rounded-xl border ${
+            isDark ? 'bg-[#360B1C] border-[#52152C]' : 'bg-[#F8F7F7] border-[#E8E2E4]'
+          }`}>
             <button
               type="button"
               onClick={() => setFormData({ ...formData, type: 'expense' })}
-              className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 formData.type === 'expense'
-                  ? 'bg-gradient-to-r from-[#3D1220] to-[#5C1D2E] text-white shadow-md border border-[#E89BA8]/30'
-                  : 'text-[#A89299] hover:text-white'
+                  ? isDark ? 'bg-[#FFFFFF] text-[#260814]' : 'bg-[#4A1025] text-[#FFFFFF]'
+                  : 'opacity-70 hover:opacity-100'
               }`}
             >
-              <ArrowUpRight className="w-4 h-4 text-[#E89BA8]" />
+              <ArrowUpRight className="w-4 h-4" />
               <span>Expense (Debit)</span>
             </button>
 
             <button
               type="button"
               onClick={() => setFormData({ ...formData, type: 'income' })}
-              className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 formData.type === 'income'
-                  ? 'bg-gradient-to-r from-[#182B1E] to-[#254630] text-[#34D399] shadow-md border border-[#34D399]/30'
-                  : 'text-[#A89299] hover:text-white'
+                  ? isDark ? 'bg-[#FFFFFF] text-[#260814]' : 'bg-[#4A1025] text-[#FFFFFF]'
+                  : 'opacity-70 hover:opacity-100'
               }`}
             >
-              <ArrowDownLeft className="w-4 h-4 text-[#34D399]" />
+              <ArrowDownLeft className="w-4 h-4" />
               <span>Income (Credit)</span>
             </button>
           </div>
 
           {/* Title / Description */}
           <div>
-            <label className="block text-xs font-semibold text-[#E89BA8] mb-1.5">
+            <label className="block text-xs font-semibold mb-1.5 opacity-90">
               Title / Description *
             </label>
             <input 
               type="text"
-              placeholder="e.g. Prestige Lease, Consulting Fee, Nature's Basket"
+              placeholder="e.g. Prestige Lease, Advisory Fee, Gourmet Provisions"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className={`w-full px-3.5 py-2.5 bg-[#1C060D] border rounded-xl text-xs text-[#FDFBF7] placeholder:text-[#6E555C] focus:outline-hidden focus:ring-1 focus:ring-[#DFB27A] ${
-                errors.title ? 'border-rose-500' : 'border-[#3D1421]'
-              }`}
+              className={`w-full px-3.5 py-2.5 border rounded-xl text-xs focus:outline-hidden ${
+                isDark ? 'bg-[#360B1C] border-[#52152C] text-[#FFFFFF]' : 'bg-[#F8F7F7] border-[#E8E2E4] text-[#260814]'
+              } ${errors.title ? 'border-red-500' : ''}`}
             />
-            {errors.title && <p className="text-[10px] text-rose-400 mt-1">{errors.title}</p>}
+            {errors.title && <p className="text-[10px] text-red-400 mt-1">{errors.title}</p>}
           </div>
 
           {/* Amount & Date Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-[#E89BA8] mb-1.5">
+              <label className="block text-xs font-semibold mb-1.5 opacity-90">
                 Amount ({currency}) *
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-[#DFB27A] font-bold">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold">
                   {currSymbol}
                 </span>
                 <input 
@@ -223,41 +231,45 @@ export default function TransactionModal({
                   placeholder="0.00"
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  className={`w-full pl-8 pr-3.5 py-2.5 bg-[#1C060D] border rounded-xl text-xs font-mono font-bold text-[#FDFBF7] placeholder:text-[#6E555C] focus:outline-hidden focus:ring-1 focus:ring-[#DFB27A] ${
-                    errors.amount ? 'border-rose-500' : 'border-[#3D1421]'
-                  }`}
+                  className={`w-full pl-8 pr-3.5 py-2.5 border rounded-xl text-xs font-mono font-bold focus:outline-hidden ${
+                    isDark ? 'bg-[#360B1C] border-[#52152C] text-[#FFFFFF]' : 'bg-[#F8F7F7] border-[#E8E2E4] text-[#260814]'
+                  } ${errors.amount ? 'border-red-500' : ''}`}
                 />
               </div>
-              {errors.amount && <p className="text-[10px] text-rose-400 mt-1">{errors.amount}</p>}
+              {errors.amount && <p className="text-[10px] text-red-400 mt-1">{errors.amount}</p>}
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#E89BA8] mb-1.5">
+              <label className="block text-xs font-semibold mb-1.5 opacity-90">
                 Transaction Date *
               </label>
               <input 
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-[#1C060D] border border-[#3D1421] rounded-xl text-xs text-[#FDFBF7] focus:outline-hidden focus:ring-1 focus:ring-[#DFB27A]"
+                className={`w-full px-3.5 py-2.5 border rounded-xl text-xs focus:outline-hidden ${
+                  isDark ? 'bg-[#360B1C] border-[#52152C] text-[#FFFFFF]' : 'bg-[#F8F7F7] border-[#E8E2E4] text-[#260814]'
+                }`}
               />
-              {errors.date && <p className="text-[10px] text-rose-400 mt-1">{errors.date}</p>}
+              {errors.date && <p className="text-[10px] text-red-400 mt-1">{errors.date}</p>}
             </div>
           </div>
 
           {/* Category & Account Selectors */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-[#E89BA8] mb-1.5">
+              <label className="block text-xs font-semibold mb-1.5 opacity-90">
                 Category
               </label>
               <select 
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-[#1C060D] border border-[#3D1421] rounded-xl text-xs text-[#FDFBF7] focus:outline-hidden focus:ring-1 focus:ring-[#DFB27A]"
+                className={`w-full px-3.5 py-2.5 border rounded-xl text-xs focus:outline-hidden ${
+                  isDark ? 'bg-[#360B1C] border-[#52152C] text-[#FFFFFF]' : 'bg-[#F8F7F7] border-[#E8E2E4] text-[#260814]'
+                }`}
               >
                 {CATEGORY_OPTIONS.map((cat) => (
-                  <option key={cat} value={cat} className="bg-[#230811] text-[#FDFBF7]">
+                  <option key={cat} value={cat} className={isDark ? 'bg-[#260814]' : 'bg-[#FFFFFF]'}>
                     {cat}
                   </option>
                 ))}
@@ -265,16 +277,18 @@ export default function TransactionModal({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#E89BA8] mb-1.5">
+              <label className="block text-xs font-semibold mb-1.5 opacity-90">
                 Funding Account
               </label>
               <select 
                 value={formData.account}
                 onChange={(e) => setFormData({ ...formData, account: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-[#1C060D] border border-[#3D1421] rounded-xl text-xs text-[#FDFBF7] focus:outline-hidden focus:ring-1 focus:ring-[#DFB27A]"
+                className={`w-full px-3.5 py-2.5 border rounded-xl text-xs focus:outline-hidden ${
+                  isDark ? 'bg-[#360B1C] border-[#52152C] text-[#FFFFFF]' : 'bg-[#F8F7F7] border-[#E8E2E4] text-[#260814]'
+                }`}
               >
                 {ACCOUNT_OPTIONS.map((acc) => (
-                  <option key={acc} value={acc} className="bg-[#230811] text-[#FDFBF7]">
+                  <option key={acc} value={acc} className={isDark ? 'bg-[#260814]' : 'bg-[#FFFFFF]'}>
                     {acc}
                   </option>
                 ))}
@@ -284,7 +298,7 @@ export default function TransactionModal({
 
           {/* Optional Memo */}
           <div>
-            <label className="block text-xs font-semibold text-[#E89BA8] mb-1.5">
+            <label className="block text-xs font-semibold mb-1.5 opacity-90">
               Memo / Notes (Optional)
             </label>
             <input 
@@ -292,22 +306,28 @@ export default function TransactionModal({
               placeholder="e.g. Tax deductible, family dinner, investment tranche"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-[#1C060D] border border-[#3D1421] rounded-xl text-xs text-[#FDFBF7] placeholder:text-[#6E555C] focus:outline-hidden focus:ring-1 focus:ring-[#DFB27A]"
+              className={`w-full px-3.5 py-2.5 border rounded-xl text-xs focus:outline-hidden ${
+                isDark ? 'bg-[#360B1C] border-[#52152C] text-[#FFFFFF]' : 'bg-[#F8F7F7] border-[#E8E2E4] text-[#260814]'
+              }`}
             />
           </div>
 
           {/* Modal Actions */}
-          <div className="pt-4 border-t border-[#3D1421] flex items-center justify-end gap-3">
+          <div className={`pt-4 border-t flex items-center justify-end gap-3 ${isDark ? 'border-[#360B1C]' : 'border-[#E8E2E4]'}`}>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl bg-[#1C060D] border border-[#3D1421] text-xs font-semibold text-[#A89299] hover:text-white hover:bg-[#2F0E1A] transition-colors"
+              className={`px-4 py-2.5 rounded-xl border text-xs font-semibold cursor-pointer ${
+                isDark ? 'bg-[#360B1C] border-[#52152C] text-[#FFFFFF]' : 'bg-[#F8F7F7] border-[#E8E2E4] text-[#260814]'
+              }`}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#DFB27A] to-[#E89BA8] text-[#230811] font-bold text-xs shadow-lg hover:opacity-95 transition-all"
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs shadow-lg transition-all cursor-pointer ${
+                isDark ? 'bg-[#FFFFFF] text-[#260814] hover:bg-[#F8F7F7]' : 'bg-[#4A1025] text-[#FFFFFF] hover:bg-[#5E142F]'
+              }`}
             >
               <Check className="w-4 h-4" />
               <span>{editingTransaction ? 'Save Changes' : 'Record Transaction'}</span>
