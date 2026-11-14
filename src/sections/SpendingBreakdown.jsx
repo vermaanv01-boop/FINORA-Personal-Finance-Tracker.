@@ -1,16 +1,16 @@
 import React from 'react';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, PlusCircle } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
 import { useTheme } from '../context/ThemeContext';
 
-export default function SpendingBreakdown({ stats, currency = 'INR' }) {
+export default function SpendingBreakdown({ stats, currency = 'INR', onOpenAddModal }) {
   const { isDark } = useTheme();
 
   const {
     essentialSpending = 0,
     discretionarySpending = 0,
     savingsAndInvestments = 0,
-    monthlyBudgetLimit = 175000,
+    monthlyBudgetLimit = 100000,
     totalSpentThisMonth = 0
   } = stats || {};
 
@@ -23,26 +23,26 @@ export default function SpendingBreakdown({ stats, currency = 'INR' }) {
     {
       title: 'Fixed & Essential Core',
       amount: essentialSpending,
-      desc: 'Housing lease, utilities, insurance',
+      desc: 'Housing, base utilities, health, essentials',
       percentage: totalSpentThisMonth > 0 ? Math.round((essentialSpending / totalSpentThisMonth) * 100) : 0,
     },
     {
       title: 'Discretionary Lifestyle',
       amount: discretionarySpending,
-      desc: 'Dining, travel, executive shopping',
+      desc: 'Dining, travel, shopping, entertainment',
       percentage: totalSpentThisMonth > 0 ? Math.round((discretionarySpending / totalSpentThisMonth) * 100) : 0,
     },
     {
       title: 'Strategic Asset Allocation',
       amount: savingsAndInvestments,
-      desc: 'Equities, index SIPs, reserves',
+      desc: 'Investments, equities, surplus reserve',
       percentage: totalSpentThisMonth > 0 ? Math.round((savingsAndInvestments / totalSpentThisMonth) * 100) : 0,
     }
   ];
 
   return (
     <div className={`
-      border rounded-2xl p-6 shadow-xl flex flex-col justify-between transition-colors
+      border rounded-2xl p-6 shadow-sm flex flex-col justify-between transition-colors min-h-[360px]
       ${isDark 
         ? 'bg-[#260814] border-[#360B1C] text-[#FFFFFF]' 
         : 'bg-[#FFFFFF] border-[#E8E2E4] text-[#260814]'
@@ -59,7 +59,7 @@ export default function SpendingBreakdown({ stats, currency = 'INR' }) {
               </h3>
             </div>
             <p className="text-xs opacity-75 mt-1">
-              Live calculated capital distribution vs configured cap
+              Capital distribution vs configured monthly envelope
             </p>
           </div>
           <div className={`px-2.5 py-1 rounded-full border text-[11px] font-semibold ${isDark ? 'bg-[#360B1C] border-[#52152C] text-[#FFFFFF]' : 'bg-[#F8F7F7] border-[#E8E2E4] text-[#4A1025]'}`}>
@@ -100,7 +100,7 @@ export default function SpendingBreakdown({ stats, currency = 'INR' }) {
                   : 'bg-[#F8F7F7] border-[#E8E2E4] hover:border-[#4A1025]'
               }`}
             >
-              <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                   <span className={`w-2.5 h-2.5 rounded-sm ${isDark ? 'bg-[#FFFFFF]' : 'bg-[#4A1025]'}`} />
                   <span className="text-xs font-semibold">{seg.title}</span>
@@ -119,9 +119,11 @@ export default function SpendingBreakdown({ stats, currency = 'INR' }) {
       <div className={`mt-5 pt-3.5 border-t flex items-center justify-between text-xs ${isDark ? 'border-[#360B1C]' : 'border-[#E8E2E4]'}`}>
         <span className="flex items-center gap-1.5 opacity-80">
           <ShieldCheck className="w-4 h-4" />
-          <span>Optimal Liquidity Margin Maintained</span>
+          <span>
+            {totalSpentThisMonth > 0 ? 'Liquidity Buffer Calculated from Ledger' : 'No expenses recorded for this billing cycle'}
+          </span>
         </span>
-        <span className="font-semibold text-[11px]">Audit OK</span>
+        <span className="font-semibold text-[11px]">Audit Active</span>
       </div>
     </div>
   );
