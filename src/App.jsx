@@ -1,122 +1,106 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import Sidebar from './components/Sidebar';
+import Header from './components/Header';
+import KpiCards from './components/KpiCards';
+import ExpensesTrendChart from './sections/ExpensesTrendChart';
+import IncomeVsExpensesChart from './sections/IncomeVsExpensesChart';
+import CategoryDonutChart from './sections/CategoryDonutChart';
+import SpendingBreakdown from './sections/SpendingBreakdown';
+import RecentTransactions from './sections/RecentTransactions';
+import TopSpendingCategories from './sections/TopSpendingCategories';
+import TransactionsView from './sections/TransactionsView';
+import AnalyticsView from './sections/AnalyticsView';
+import SettingsView from './sections/SettingsView';
+import { useFinanceData } from './hooks/useFinanceData';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const {
+    kpis,
+    monthlyExpensesTrend,
+    incomeVsExpenses,
+    categoryExpenses,
+    topCategories,
+    recentTransactions,
+    spendingBreakdown,
+    resetToDefault
+  } = useFinanceData();
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="min-h-screen bg-[#FDFBF7] text-[#1F2937] flex flex-col lg:flex-row antialiased selection:bg-[#E89BA8]/30 selection:text-[#230811]">
+      {/* Sidebar Navigation */}
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+      />
 
-      <div className="ticks"></div>
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+        <Header 
+          onMenuClick={() => setMobileOpen(true)}
+          activeTab={activeTab}
+        />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto w-full">
+          {activeTab === 'dashboard' && (
+            <>
+              {/* 1. Top KPI Summary Cards */}
+              <KpiCards kpis={kpis} />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+              {/* 2. Primary Analytics Visualizations: Monthly Expenses Trend & Income vs Expenses */}
+              <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <ExpensesTrendChart data={monthlyExpensesTrend} />
+                <IncomeVsExpensesChart data={incomeVsExpenses} />
+              </section>
+
+              {/* 3. Mid Section: Donut Category Distribution & Structured Spending Breakdown */}
+              <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <CategoryDonutChart data={categoryExpenses} />
+                <SpendingBreakdown stats={spendingBreakdown} />
+              </section>
+
+              {/* 4. Bottom Section: Recent Transactions Ledger & Top Spending Categories */}
+              <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                  <RecentTransactions transactions={recentTransactions} />
+                </div>
+                <div className="lg:col-span-1">
+                  <TopSpendingCategories categories={topCategories} />
+                </div>
+              </section>
+            </>
+          )}
+
+          {activeTab === 'transactions' && (
+            <TransactionsView transactions={recentTransactions} />
+          )}
+
+          {activeTab === 'analytics' && (
+            <AnalyticsView 
+              monthlyExpensesTrend={monthlyExpensesTrend}
+              incomeVsExpenses={incomeVsExpenses}
+              categoryExpenses={categoryExpenses}
+            />
+          )}
+
+          {activeTab === 'settings' && (
+            <SettingsView resetToDefault={resetToDefault} />
+          )}
+        </main>
+
+        {/* Global Footer */}
+        <footer className="border-t border-[#EADDCD] py-4 px-6 sm:px-8 text-xs text-[#8C7A80] flex flex-col sm:flex-row items-center justify-between gap-2 bg-[#FDFBF7]">
+          <div className="flex items-center gap-2">
+            <span className="font-serif font-bold text-[#230811]">FINORA</span>
+            <span>• Personal Wealth Intelligence Platform</span>
+          </div>
+          <p>© 2026 FINORA Inc. Frontend Phase 1 Build • LocalStorage active</p>
+        </footer>
+      </div>
+    </div>
+  );
 }
-
-export default App
