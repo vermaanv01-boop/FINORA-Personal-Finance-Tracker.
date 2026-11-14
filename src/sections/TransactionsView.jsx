@@ -8,13 +8,15 @@ import {
   CheckCircle, 
   Sparkles, 
   Edit2, 
-  Trash2 
+  Trash2,
+  Receipt,
+  PlusCircle
 } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
 import { useTheme } from '../context/ThemeContext';
 
 export default function TransactionsView({ 
-  transactions, 
+  transactions = [], 
   currency = 'INR',
   onOpenAddModal,
   onEditTransaction,
@@ -31,16 +33,17 @@ export default function TransactionsView({
     const matchesFilter = filterType === 'all' || t.type === filterType;
     const matchesCategory = selectedCategory === 'all' || t.category === selectedCategory;
     const matchesSearch = 
-      t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (t.title && t.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (t.category && t.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (t.account && t.account.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesFilter && matchesCategory && matchesSearch;
   });
 
   const exportCSV = () => {
+    if (filtered.length === 0) return;
     const headers = ['ID,Title,Type,Category,Account,Date,Status,Amount\n'];
     const rows = filtered.map(t => 
-      `"${t.id}","${t.title.replace(/"/g, '""')}","${t.type}","${t.category}","${t.account}","${t.date}","${t.status}",${t.amount}`
+      `"${t.id}","${(t.title || '').replace(/"/g, '""')}","${t.type}","${t.category}","${t.account}","${t.date}","${t.status}",${t.amount}`
     );
     const blob = new Blob([headers.concat(rows.join('\n'))], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -147,10 +150,15 @@ export default function TransactionsView({
 
           <button 
             onClick={exportCSV}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition-colors cursor-pointer ${
+            disabled={filtered.length === 0}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition-colors ${
+              filtered.length === 0 
+                ? 'opacity-40 cursor-not-allowed' 
+                : 'cursor-pointer hover:opacity-100'
+            } ${
               isDark ? 'bg-[#360B1C] border-[#52152C] text-[#FFFFFF] hover:bg-[#4A1025]' : 'bg-[#F8F7F7] border-[#E8E2E4] text-[#4A1025] hover:bg-[#FFFFFF]'
             }`}
-            title="Download records in CSV"
+            title={filtered.length === 0 ? "No records to export" : "Download records in CSV"}
           >
             <Download className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Export CSV</span>
@@ -182,10 +190,33 @@ export default function TransactionsView({
               </tr>
             </thead>
             <tbody className={`divide-y text-xs ${isDark ? 'divide-[#360B1C] text-[#FFFFFF]' : 'divide-[#E8E2E4] text-[#260814]'}`}>
-              {filtered.length === 0 ? (
+              {transactions.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="text-center py-8 opacity-60">
-                    No transactions match your search filter.
+                  <td colSpan="7" className="text-center py-16 px-4">
+                    <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-3 ${isDark ? 'bg-[#360B1C] text-[#FFFFFF]' : 'bg-[#F8F7F7] text-[#4A1025]'}`}>
+                        <Receipt className="w-6 h-6 opacity-60" />
+                      </div>
+                      <h4 className="font-serif font-bold text-base mb-1">Your Ledger is Clean & Empty</h4>
+                      <p className="text-xs opacity-75 leading-relaxed mb-4">
+                        You have not recorded any financial transactions yet. Add your income or expense entries to begin tracking.
+                      </p>
+                      <button
+                        onClick={onOpenAddModal}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer ${
+                          isDark ? 'bg-[#FFFFFF] text-[#260814] hover:bg-[#F8F7F7]' : 'bg-[#4A1025] text-[#FFFFFF] hover:bg-[#5E142F]'
+                        }`}
+                      >
+                        <PlusCircle className="w-4 h-4" />
+                        <span>Add First Transaction</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-12 opacity-60">
+                    No transactions match your search filter "{searchTerm}".
                   </td>
                 </tr>
               ) : (
@@ -218,7 +249,7 @@ export default function TransactionsView({
                             : 'bg-[#F8F7F7] text-[#4A1025] border-[#E8E2E4]'
                         }`}>
                           <CheckCircle className="w-3 h-3" />
-                          {item.status}
+                          {item.status || 'Completed'}
                         </span>
                       </td>
                       <td className="py-4 px-5 text-right font-mono font-bold">
