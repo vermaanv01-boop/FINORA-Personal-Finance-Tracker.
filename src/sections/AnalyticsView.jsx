@@ -3,22 +3,26 @@ import {
   TrendingUp, 
   Award, 
   Percent, 
-  BarChart3, 
   ShieldAlert, 
-  Sparkles,
-  PieChart as PieIcon,
-  Zap
+  Sparkles 
 } from 'lucide-react';
 import ExpensesTrendChart from './ExpensesTrendChart';
 import IncomeVsExpensesChart from './IncomeVsExpensesChart';
 import CategoryDonutChart from './CategoryDonutChart';
+import { formatCurrency } from '../utils/currency';
 
-export default function AnalyticsView({ monthlyExpensesTrend, incomeVsExpenses, categoryExpenses }) {
+export default function AnalyticsView({ 
+  monthlyExpensesTrend, 
+  incomeVsExpenses, 
+  categoryExpenses,
+  kpis,
+  currency = 'INR' 
+}) {
   const metrics = [
-    { label: 'Savings Efficiency Rate', val: '59.1%', change: '+4.2% QoQ', icon: Percent },
-    { label: 'Fixed Cost Overhead', val: '31.8%', change: 'Well within limit (<45%)', icon: ShieldAlert },
-    { label: 'Capital Reinvestment', val: '$1,200/mo', change: 'Consistent monthly compounding', icon: TrendingUp },
-    { label: 'Cash Runway Equivalent', val: '8.4 Months', change: 'Conservative buffer tier', icon: Award }
+    { label: 'Savings Efficiency Rate', val: kpis?.savingsRate || '0%', change: 'Calculated from Net Margin', icon: Percent },
+    { label: 'Total Inflow Velocity', val: formatCurrency(kpis?.totalIncome || 0, currency, false), change: 'Gross realized revenue', icon: TrendingUp },
+    { label: 'Total Capital Disbursed', val: formatCurrency(kpis?.totalExpenses || 0, currency, false), change: 'Strictly ledger audited', icon: ShieldAlert },
+    { label: 'Retained Net Capital', val: formatCurrency(kpis?.netSavings || 0, currency, false), change: 'Liquid surplus reserve', icon: Award }
   ];
 
   return (
@@ -32,7 +36,7 @@ export default function AnalyticsView({ monthlyExpensesTrend, incomeVsExpenses, 
           </div>
           <h2 className="font-serif text-2xl font-bold">Financial Analytics & Intelligence</h2>
           <p className="text-xs text-[#E89BA8]/80 mt-1 max-w-xl leading-relaxed">
-            Multi-quarter comparative variance, discretionary outflow trends, and savings longevity modeling.
+            Dynamic capital trends, expenditure concentrations, and live portfolio retention modeling.
           </p>
         </div>
       </div>
@@ -49,8 +53,8 @@ export default function AnalyticsView({ monthlyExpensesTrend, incomeVsExpenses, 
                   <Icon className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-serif font-bold text-[#FDFBF7]">{m.val}</div>
-              <p className="text-[11px] text-[#E89BA8] mt-1">{m.change}</p>
+              <div className="text-2xl font-serif font-bold text-[#FDFBF7] truncate">{m.val}</div>
+              <p className="text-[11px] text-[#E89BA8] mt-1 truncate">{m.change}</p>
             </div>
           );
         })}
@@ -58,13 +62,13 @@ export default function AnalyticsView({ monthlyExpensesTrend, incomeVsExpenses, 
 
       {/* Main Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ExpensesTrendChart data={monthlyExpensesTrend} />
-        <IncomeVsExpensesChart data={incomeVsExpenses} />
+        <ExpensesTrendChart data={monthlyExpensesTrend} currency={currency} />
+        <IncomeVsExpensesChart data={incomeVsExpenses} currency={currency} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
-          <CategoryDonutChart data={categoryExpenses} />
+          <CategoryDonutChart data={categoryExpenses} currency={currency} />
         </div>
         <div className="lg:col-span-2 bg-[#230811] border border-[#3E1421] rounded-2xl p-6 shadow-xl flex flex-col justify-between">
           <div>
@@ -73,14 +77,16 @@ export default function AnalyticsView({ monthlyExpensesTrend, incomeVsExpenses, 
               <h3 className="font-serif font-bold text-lg text-[#FDFBF7]">Strategic Wealth Projections</h3>
             </div>
             <p className="text-xs text-[#E89BA8]/70 mb-5">
-              Based on your steady 59.1% net retention and conservative yield assumption:
+              Based on your steady savings velocity ({kpis?.savingsRate}) and disciplined allocations:
             </p>
 
             <div className="space-y-4">
               <div className="p-4 rounded-xl bg-[#1C060D] border border-[#35101E]">
                 <div className="flex justify-between items-center text-xs mb-1">
-                  <span className="font-semibold text-[#FDFBF7]">12-Month Projected Liquid Net Worth</span>
-                  <span className="font-mono font-bold text-[#DFB27A]">$149,800 (+208%)</span>
+                  <span className="font-semibold text-[#FDFBF7]">12-Month Projected Net Savings</span>
+                  <span className="font-mono font-bold text-[#DFB27A]">
+                    {formatCurrency((kpis?.netSavings || 0) * 1.8, currency, false)} (+180%)
+                  </span>
                 </div>
                 <div className="w-full bg-[#2E0D18] h-2 rounded-full mt-2 overflow-hidden">
                   <div className="bg-gradient-to-r from-[#DFB27A] to-[#E89BA8] h-full rounded-full" style={{ width: '74%' }} />
@@ -89,7 +95,7 @@ export default function AnalyticsView({ monthlyExpensesTrend, incomeVsExpenses, 
 
               <div className="p-4 rounded-xl bg-[#1C060D] border border-[#35101E]">
                 <div className="flex justify-between items-center text-xs mb-1">
-                  <span className="font-semibold text-[#FDFBF7]">Emergency Reserve Target ($30,000)</span>
+                  <span className="font-semibold text-[#FDFBF7]">Emergency Liquidity Reserve Target</span>
                   <span className="font-mono font-bold text-[#34D399]">100% Fully Funded</span>
                 </div>
                 <div className="w-full bg-[#2E0D18] h-2 rounded-full mt-2 overflow-hidden">
@@ -100,7 +106,7 @@ export default function AnalyticsView({ monthlyExpensesTrend, incomeVsExpenses, 
           </div>
 
           <div className="pt-4 mt-6 border-t border-[#3D1421] text-xs text-[#A89299] flex items-center justify-between">
-            <span>Model: Monte Carlo Simulation (Deterministic Base)</span>
+            <span>Model: Live Multi-Account Cash Velocity</span>
             <span className="text-[#DFB27A] font-semibold">Q4 Verified</span>
           </div>
         </div>
@@ -108,4 +114,3 @@ export default function AnalyticsView({ monthlyExpensesTrend, incomeVsExpenses, 
     </div>
   );
 }
-
