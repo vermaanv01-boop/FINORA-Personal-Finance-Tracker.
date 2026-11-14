@@ -11,7 +11,9 @@ import {
   Home,
   Zap,
   Edit2,
-  Trash2
+  Trash2,
+  Receipt,
+  PlusCircle
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { formatCurrency } from '../utils/currency';
@@ -30,8 +32,9 @@ const iconMap = {
 };
 
 export default function RecentTransactions({ 
-  transactions, 
+  transactions = [], 
   currency = 'INR',
+  onOpenAddModal,
   onEditTransaction,
   onDeleteTransaction 
 }) {
@@ -45,7 +48,7 @@ export default function RecentTransactions({
 
   return (
     <div className={`
-      border rounded-2xl p-6 shadow-xl flex flex-col justify-between transition-colors
+      border rounded-2xl p-6 shadow-sm flex flex-col justify-between transition-colors min-h-[360px]
       ${isDark 
         ? 'bg-[#260814] border-[#360B1C] text-[#FFFFFF]' 
         : 'bg-[#FFFFFF] border-[#E8E2E4] text-[#260814]'
@@ -62,33 +65,56 @@ export default function RecentTransactions({
               </h3>
             </div>
             <p className="text-xs opacity-75 mt-1">
-              Live settlement across linked banking & investment accounts
+              Live settlement across user accounts
             </p>
           </div>
 
           {/* Filter Pills */}
-          <div className={`flex items-center gap-1.5 p-1 rounded-xl border self-start sm:self-auto ${isDark ? 'bg-[#360B1C] border-[#52152C]' : 'bg-[#F8F7F7] border-[#E8E2E4]'}`}>
-            {['all', 'income', 'expense'].map((type) => (
-              <button
-                key={type}
-                onClick={() => setFilterType(type)}
-                className={`px-3 py-1 text-xs font-semibold rounded-lg capitalize transition-colors cursor-pointer ${
-                  filterType === type 
-                    ? isDark ? 'bg-[#FFFFFF] text-[#260814]' : 'bg-[#4A1025] text-[#FFFFFF]' 
-                    : 'opacity-70 hover:opacity-100'
-                }`}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
+          {transactions.length > 0 && (
+            <div className={`flex items-center gap-1.5 p-1 rounded-xl border self-start sm:self-auto ${isDark ? 'bg-[#360B1C] border-[#52152C]' : 'bg-[#F8F7F7] border-[#E8E2E4]'}`}>
+              {['all', 'income', 'expense'].map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setFilterType(type)}
+                  className={`px-3 py-1 text-xs font-semibold rounded-lg capitalize transition-colors cursor-pointer ${
+                    filterType === type 
+                      ? isDark ? 'bg-[#FFFFFF] text-[#260814]' : 'bg-[#4A1025] text-[#FFFFFF]' 
+                      : 'opacity-70 hover:opacity-100'
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Transactions List */}
+        {/* Transactions List or Proper Empty State */}
         <div className="space-y-3">
-          {filtered.length === 0 ? (
+          {transactions.length === 0 ? (
+            <div className="py-12 px-4 text-center flex flex-col items-center">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-3 ${isDark ? 'bg-[#360B1C] text-[#FFFFFF]' : 'bg-[#F8F7F7] text-[#4A1025]'}`}>
+                <Receipt className="w-6 h-6 opacity-60" />
+              </div>
+              <h4 className="font-serif font-bold text-base mb-1">No Transactions Recorded Yet</h4>
+              <p className="text-xs opacity-75 max-w-sm mb-4 leading-relaxed">
+                Your personal ledger is completely empty. Start tracking your income and expenses to see live updates.
+              </p>
+              {onOpenAddModal && (
+                <button
+                  onClick={onOpenAddModal}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer ${
+                    isDark ? 'bg-[#FFFFFF] text-[#260814] hover:bg-[#F8F7F7]' : 'bg-[#4A1025] text-[#FFFFFF] hover:bg-[#5E142F]'
+                  }`}
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>Record First Transaction</span>
+                </button>
+              )}
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="p-8 text-center text-xs opacity-60">
-              No transactions found matching criteria.
+              No transactions found matching the selected filter.
             </div>
           ) : (
             filtered.slice(0, 6).map((item) => {
