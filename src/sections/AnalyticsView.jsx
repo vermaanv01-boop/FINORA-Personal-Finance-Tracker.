@@ -10,6 +10,7 @@ import ExpensesTrendChart from './ExpensesTrendChart';
 import IncomeVsExpensesChart from './IncomeVsExpensesChart';
 import CategoryDonutChart from './CategoryDonutChart';
 import { formatCurrency } from '../utils/currency';
+import { useTheme } from '../context/ThemeContext';
 
 export default function AnalyticsView({ 
   monthlyExpensesTrend, 
@@ -18,6 +19,8 @@ export default function AnalyticsView({
   kpis,
   currency = 'INR' 
 }) {
+  const { isDark } = useTheme();
+
   const metrics = [
     { label: 'Savings Efficiency Rate', val: kpis?.savingsRate || '0%', change: 'Calculated from Net Margin', icon: Percent },
     { label: 'Total Inflow Velocity', val: formatCurrency(kpis?.totalIncome || 0, currency, false), change: 'Gross realized revenue', icon: TrendingUp },
@@ -28,15 +31,21 @@ export default function AnalyticsView({
   return (
     <div className="space-y-6">
       {/* Banner */}
-      <div className="bg-gradient-to-r from-[#2D0B16] via-[#230811] to-[#18040C] border border-[#481827] rounded-2xl p-6 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className={`
+        border rounded-2xl p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors
+        ${isDark 
+          ? 'bg-[#360B1C] border-[#52152C] text-[#FFFFFF]' 
+          : 'bg-[#4A1025] border-[#5E142F] text-[#FFFFFF]'
+        }
+      `}>
         <div>
-          <div className="flex items-center gap-2 text-xs text-[#DFB27A] font-semibold uppercase tracking-wider mb-1">
+          <div className="flex items-center gap-2 text-xs opacity-80 font-semibold uppercase tracking-wider mb-1">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Deep Insights</span>
           </div>
           <h2 className="font-serif text-2xl font-bold">Financial Analytics & Intelligence</h2>
-          <p className="text-xs text-[#E89BA8]/80 mt-1 max-w-xl leading-relaxed">
-            Dynamic capital trends, expenditure concentrations, and live portfolio retention modeling.
+          <p className="text-xs opacity-80 mt-1 max-w-xl leading-relaxed">
+            Dynamic capital trends, expenditure concentrations, and live portfolio retention modeling in White & Burgundy.
           </p>
         </div>
       </div>
@@ -46,15 +55,22 @@ export default function AnalyticsView({
         {metrics.map((m) => {
           const Icon = m.icon;
           return (
-            <div key={m.label} className="bg-[#230811] border border-[#3E1421] p-5 rounded-2xl shadow-lg">
+            <div 
+              key={m.label} 
+              className={`p-5 rounded-2xl border shadow-lg transition-colors ${
+                isDark 
+                  ? 'bg-[#260814] border-[#360B1C] text-[#FFFFFF]' 
+                  : 'bg-[#FFFFFF] border-[#E8E2E4] text-[#260814]'
+              }`}
+            >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-semibold text-[#A89299] uppercase tracking-wider">{m.label}</span>
-                <div className="p-2 rounded-lg bg-[#2E0D18] text-[#DFB27A]">
+                <span className="text-[11px] font-semibold opacity-60 uppercase tracking-wider">{m.label}</span>
+                <div className={`p-2 rounded-lg ${isDark ? 'bg-[#360B1C] text-[#FFFFFF]' : 'bg-[#F8F7F7] text-[#4A1025]'}`}>
                   <Icon className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-serif font-bold text-[#FDFBF7] truncate">{m.val}</div>
-              <p className="text-[11px] text-[#E89BA8] mt-1 truncate">{m.change}</p>
+              <div className="text-2xl font-serif font-bold truncate">{m.val}</div>
+              <p className="text-[11px] opacity-75 mt-1 truncate">{m.change}</p>
             </div>
           );
         })}
@@ -70,44 +86,48 @@ export default function AnalyticsView({
         <div className="lg:col-span-1">
           <CategoryDonutChart data={categoryExpenses} currency={currency} />
         </div>
-        <div className="lg:col-span-2 bg-[#230811] border border-[#3E1421] rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+        <div className={`lg:col-span-2 border rounded-2xl p-6 shadow-xl flex flex-col justify-between transition-colors ${
+          isDark 
+            ? 'bg-[#260814] border-[#360B1C] text-[#FFFFFF]' 
+            : 'bg-[#FFFFFF] border-[#E8E2E4] text-[#260814]'
+        }`}>
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-[#DFB27A]" />
-              <h3 className="font-serif font-bold text-lg text-[#FDFBF7]">Strategic Wealth Projections</h3>
+              <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-[#FFFFFF]' : 'bg-[#4A1025]'}`} />
+              <h3 className="font-serif font-bold text-lg">Strategic Wealth Projections</h3>
             </div>
-            <p className="text-xs text-[#E89BA8]/70 mb-5">
+            <p className="text-xs opacity-75 mb-5">
               Based on your steady savings velocity ({kpis?.savingsRate}) and disciplined allocations:
             </p>
 
             <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-[#1C060D] border border-[#35101E]">
+              <div className={`p-4 rounded-xl border ${isDark ? 'bg-[#360B1C] border-[#52152C]' : 'bg-[#F8F7F7] border-[#E8E2E4]'}`}>
                 <div className="flex justify-between items-center text-xs mb-1">
-                  <span className="font-semibold text-[#FDFBF7]">12-Month Projected Net Savings</span>
-                  <span className="font-mono font-bold text-[#DFB27A]">
+                  <span className="font-semibold">12-Month Projected Net Savings</span>
+                  <span className="font-mono font-bold">
                     {formatCurrency((kpis?.netSavings || 0) * 1.8, currency, false)} (+180%)
                   </span>
                 </div>
-                <div className="w-full bg-[#2E0D18] h-2 rounded-full mt-2 overflow-hidden">
-                  <div className="bg-gradient-to-r from-[#DFB27A] to-[#E89BA8] h-full rounded-full" style={{ width: '74%' }} />
+                <div className={`w-full h-2 rounded-full mt-2 overflow-hidden ${isDark ? 'bg-[#260814]' : 'bg-[#E8E2E4]'}`}>
+                  <div className={`h-full rounded-full ${isDark ? 'bg-[#FFFFFF]' : 'bg-[#4A1025]'}`} style={{ width: '74%' }} />
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl bg-[#1C060D] border border-[#35101E]">
+              <div className={`p-4 rounded-xl border ${isDark ? 'bg-[#360B1C] border-[#52152C]' : 'bg-[#F8F7F7] border-[#E8E2E4]'}`}>
                 <div className="flex justify-between items-center text-xs mb-1">
-                  <span className="font-semibold text-[#FDFBF7]">Emergency Liquidity Reserve Target</span>
-                  <span className="font-mono font-bold text-[#34D399]">100% Fully Funded</span>
+                  <span className="font-semibold">Emergency Liquidity Reserve Target</span>
+                  <span className="font-mono font-bold">100% Fully Funded</span>
                 </div>
-                <div className="w-full bg-[#2E0D18] h-2 rounded-full mt-2 overflow-hidden">
-                  <div className="bg-[#34D399] h-full rounded-full" style={{ width: '100%' }} />
+                <div className={`w-full h-2 rounded-full mt-2 overflow-hidden ${isDark ? 'bg-[#260814]' : 'bg-[#E8E2E4]'}`}>
+                  <div className={`h-full rounded-full ${isDark ? 'bg-[#FFFFFF]' : 'bg-[#4A1025]'}`} style={{ width: '100%' }} />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="pt-4 mt-6 border-t border-[#3D1421] text-xs text-[#A89299] flex items-center justify-between">
+          <div className={`pt-4 mt-6 border-t text-xs opacity-75 flex items-center justify-between ${isDark ? 'border-[#360B1C]' : 'border-[#E8E2E4]'}`}>
             <span>Model: Live Multi-Account Cash Velocity</span>
-            <span className="text-[#DFB27A] font-semibold">Q4 Verified</span>
+            <span className="font-semibold">Q4 Verified</span>
           </div>
         </div>
       </div>
