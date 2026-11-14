@@ -5,46 +5,26 @@ const AuthContext = createContext();
 const USERS_STORAGE_KEY = 'finora_registered_users';
 const CURRENT_USER_KEY = 'finora_current_user';
 
-// Pre-seeded demo user for quick sign-in
-const DEFAULT_DEMO_USER = {
-  id: 'usr_demo',
-  name: 'Eleanor Laurence',
-  email: 'demo@finora.io',
-  password: 'Password123!',
-  createdAt: new Date().toISOString()
-};
-
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(() => {
     try {
-      const saved = localStorage.getItem(CURRENT_USER_KEY);
-      if (saved) return JSON.parse(saved);
-      // Automatically keep demo logged in by default for smooth experience,
-      // or user can log out
-      return DEFAULT_DEMO_USER;
-    } catch {
-      return DEFAULT_DEMO_USER;
-    }
-  });
-
-  // Ensure demo user exists in registered list
-  useEffect(() => {
-    try {
-      const rawUsers = localStorage.getItem(USERS_STORAGE_KEY);
-      let users = rawUsers ? JSON.parse(rawUsers) : [];
-      if (!users.some(u => u.email.toLowerCase() === DEFAULT_DEMO_USER.email.toLowerCase())) {
-        users.push(DEFAULT_DEMO_USER);
-        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+      const saved = localStorage.getItem(CURRENT_USER_KEY) || sessionStorage.getItem(CURRENT_USER_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.email) {
+          return parsed;
+        }
       }
     } catch (e) {
-      console.warn('Could not initialize users store', e);
+      console.warn('Could not read user from storage', e);
     }
-  }, []);
+    return null;
+  });
 
   const login = (email, password, remember = true) => {
     try {
       const rawUsers = localStorage.getItem(USERS_STORAGE_KEY);
-      const users = rawUsers ? JSON.parse(rawUsers) : [DEFAULT_DEMO_USER];
+      const users = rawUsers ? JSON.parse(rawUsers) : [];
       const found = users.find(
         (u) => u.email.toLowerCase() === email.trim().toLowerCase() && u.password === password
       );
@@ -60,7 +40,7 @@ export function AuthProvider({ children }) {
         }
         return { success: true, user: safeUser };
       }
-      return { success: false, error: 'Invalid email or password combination.' };
+      return { success: false, error: 'Invalid email or password. Please check your credentials or register.' };
     } catch (err) {
       return { success: false, error: 'Authentication failed. Please check localStorage.' };
     }
@@ -69,10 +49,10 @@ export function AuthProvider({ children }) {
   const signup = (name, email, password) => {
     try {
       const rawUsers = localStorage.getItem(USERS_STORAGE_KEY);
-      let users = rawUsers ? JSON.parse(rawUsers) : [DEFAULT_DEMO_USER];
+      let users = rawUsers ? JSON.parse(rawUsers) : [];
 
       if (users.some((u) => u.email.toLowerCase() === email.trim().toLowerCase())) {
-        return { success: false, error: 'An account with this email already exists.' };
+        return { success: false, error: 'An account with this email already exists. Please sign in.' };
       }
 
       const newUser = {
@@ -113,8 +93,7 @@ export function AuthProvider({ children }) {
         isAuthenticated: !!currentUser,
         login,
         signup,
-        logout,
-        demoUser: DEFAULT_DEMO_USER
+        logout
       }}
     >
       {children}
@@ -127,4 +106,3 @@ export function useAuth() {
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 }
-
