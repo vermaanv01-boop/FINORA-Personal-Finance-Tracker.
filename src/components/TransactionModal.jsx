@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   PlusCircle, 
@@ -7,10 +7,10 @@ import {
   Calendar, 
   CreditCard, 
   Tag, 
-  DollarSign, 
-  FileText,
-  Check
+  Check,
+  Edit3
 } from 'lucide-react';
+import { CURRENCIES } from '../utils/currency';
 
 const CATEGORY_OPTIONS = [
   'Housing & Rent',
@@ -27,33 +27,70 @@ const CATEGORY_OPTIONS = [
 ];
 
 const ACCOUNT_OPTIONS = [
-  'Signature Card •• 8842',
-  'Treasury Premier •• 3011',
-  'Investment Portfolio •• 1920',
-  'High-Yield Savings •• 4409',
+  'HDFC Imperia •• 4910',
+  'Infinia Metal •• 8842',
+  'Zerodha Demat •• 8821',
+  'ICICI Wealth •• 3011',
+  'SBI Premier Savings •• 9022',
   'Cash Reserve'
 ];
 
-export default function TransactionModal({ isOpen, onClose, onAddTransaction }) {
+export default function TransactionModal({ 
+  isOpen, 
+  onClose, 
+  onSaveTransaction, 
+  editingTransaction = null,
+  currency = 'INR'
+}) {
   const [formData, setFormData] = useState({
     title: '',
     amount: '',
     type: 'expense',
     category: 'Food & Dining',
-    account: 'Signature Card •• 8842',
+    account: 'HDFC Imperia •• 4910',
     date: new Date().toISOString().split('T')[0],
     notes: ''
   });
 
   const [errors, setErrors] = useState({});
 
+  useEffect(() => {
+    if (editingTransaction) {
+      setFormData({
+        title: editingTransaction.title || '',
+        amount: editingTransaction.amount?.toString() || '',
+        type: editingTransaction.type || 'expense',
+        category: editingTransaction.category || 'Food & Dining',
+        account: editingTransaction.account || 'HDFC Imperia •• 4910',
+        date: editingTransaction.date?.slice(0, 10) || new Date().toISOString().split('T')[0],
+        notes: editingTransaction.notes || ''
+      });
+    } else {
+      setFormData({
+        title: '',
+        amount: '',
+        type: 'expense',
+        category: 'Food & Dining',
+        account: 'HDFC Imperia •• 4910',
+        date: new Date().toISOString().split('T')[0],
+        notes: ''
+      });
+    }
+    setErrors({});
+  }, [editingTransaction, isOpen]);
+
   if (!isOpen) return null;
+
+  const currSymbol = CURRENCIES[currency]?.symbol || '₹';
 
   const validate = () => {
     const errs = {};
-    if (!formData.title.trim()) errs.title = 'Title / Payee is required';
+    if (!formData.title.trim()) errs.title = 'Payee or description is required';
     if (!formData.amount || isNaN(formData.amount) || Number(formData.amount) <= 0) {
-      errs.amount = 'Valid positive amount is required';
+      errs.amount = 'Please enter a valid amount greater than 0';
+    }
+    if (!formData.date) {
+      errs.date = 'Date is required';
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -63,7 +100,6 @@ export default function TransactionModal({ isOpen, onClose, onAddTransaction }) 
     e.preventDefault();
     if (!validate()) return;
 
-    // Pick icon based on type or category
     let icon = 'CreditCard';
     if (formData.type === 'income') {
       icon = 'ArrowDownLeft';
@@ -72,29 +108,25 @@ export default function TransactionModal({ isOpen, onClose, onAddTransaction }) 
       else if (formData.category.includes('Travel')) icon = 'Plane';
       else if (formData.category.includes('Invest')) icon = 'TrendingUp';
       else if (formData.category.includes('Health')) icon = 'Activity';
+      else if (formData.category.includes('Housing')) icon = 'Home';
+      else if (formData.category.includes('Util')) icon = 'Zap';
       else icon = 'Laptop';
     }
 
-    const formattedDate = new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit'
-    }).format(new Date());
-
-    const newTx = {
-      id: `tx-${Date.now().toString().slice(-4)}`,
+    const payload = {
+      ...(editingTransaction ? { id: editingTransaction.id } : {}),
       title: formData.title.trim(),
       amount: parseFloat(formData.amount),
       type: formData.type,
       category: formData.category,
       account: formData.account,
-      date: `Today, ${formattedDate.split(', ')[1]}`,
-      status: 'Completed',
+      date: formData.date,
+      status: editingTransaction?.status || 'Completed',
+      notes: formData.notes.trim(),
       icon
     };
 
-    onAddTransaction(newTx);
+    onSaveTransaction(payload);
     onClose();
   };
 
@@ -108,11 +140,15 @@ export default function TransactionModal({ isOpen, onClose, onAddTransaction }) 
         <div className="px-6 py-5 border-b border-[#3E1421] flex items-center justify-between bg-gradient-to-r from-[#2D0B16] to-[#1C060D]">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#DFB27A] to-[#E89BA8] flex items-center justify-center text-[#230811]">
-              <PlusCircle className="w-4 h-4 font-bold" />
+              {editingTransaction ? <Edit3 className="w-4 h-4 font-bold" /> : <PlusCircle className="w-4 h-4 font-bold" />}
             </div>
             <div>
-              <h3 className="font-serif font-bold text-lg leading-tight">Add Transaction</h3>
-              <p className="text-[11px] text-[#E89BA8]/70">Enter details to post to FINORA ledger</p>
+              <h3 className="font-serif font-bold text-lg leading-tight">
+                {editingTransaction ? 'Edit Transaction' : 'Record Transaction'}
+              </h3>
+              <p className="text-[11px] text-[#E89BA8]/70">
+                {editingTransaction ? `Updating entry ${editingTransaction.id}` : 'Enter transaction details to update ledger & charts'}
+              </p>
             </div>
           </div>
           <button 
@@ -157,19 +193,17 @@ export default function TransactionModal({ isOpen, onClose, onAddTransaction }) 
           {/* Title / Description */}
           <div>
             <label className="block text-xs font-semibold text-[#E89BA8] mb-1.5">
-              Title / Payee Description *
+              Title / Description *
             </label>
-            <div className="relative">
-              <input 
-                type="text"
-                placeholder="e.g. Apple Store, St. Regis Hotel, Client Invoice"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className={`w-full px-3.5 py-2.5 bg-[#1C060D] border rounded-xl text-xs text-[#FDFBF7] placeholder:text-[#6E555C] focus:outline-hidden focus:ring-1 focus:ring-[#DFB27A] ${
-                  errors.title ? 'border-rose-500' : 'border-[#3D1421]'
-                }`}
-              />
-            </div>
+            <input 
+              type="text"
+              placeholder="e.g. Prestige Lease, Consulting Fee, Nature's Basket"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className={`w-full px-3.5 py-2.5 bg-[#1C060D] border rounded-xl text-xs text-[#FDFBF7] placeholder:text-[#6E555C] focus:outline-hidden focus:ring-1 focus:ring-[#DFB27A] ${
+                errors.title ? 'border-rose-500' : 'border-[#3D1421]'
+              }`}
+            />
             {errors.title && <p className="text-[10px] text-rose-400 mt-1">{errors.title}</p>}
           </div>
 
@@ -177,13 +211,15 @@ export default function TransactionModal({ isOpen, onClose, onAddTransaction }) 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-[#E89BA8] mb-1.5">
-                Amount (USD) *
+                Amount ({currency}) *
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-[#DFB27A] font-bold">$</span>
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-[#DFB27A] font-bold">
+                  {currSymbol}
+                </span>
                 <input 
                   type="number"
-                  step="0.01"
+                  step="any"
                   placeholder="0.00"
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
@@ -197,16 +233,15 @@ export default function TransactionModal({ isOpen, onClose, onAddTransaction }) 
 
             <div>
               <label className="block text-xs font-semibold text-[#E89BA8] mb-1.5">
-                Transaction Date
+                Transaction Date *
               </label>
-              <div className="relative">
-                <input 
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-[#1C060D] border border-[#3D1421] rounded-xl text-xs text-[#FDFBF7] focus:outline-hidden focus:ring-1 focus:ring-[#DFB27A]"
-                />
-              </div>
+              <input 
+                type="date"
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                className="w-full px-3.5 py-2.5 bg-[#1C060D] border border-[#3D1421] rounded-xl text-xs text-[#FDFBF7] focus:outline-hidden focus:ring-1 focus:ring-[#DFB27A]"
+              />
+              {errors.date && <p className="text-[10px] text-rose-400 mt-1">{errors.date}</p>}
             </div>
           </div>
 
@@ -247,14 +282,14 @@ export default function TransactionModal({ isOpen, onClose, onAddTransaction }) 
             </div>
           </div>
 
-          {/* Optional Notes */}
+          {/* Optional Memo */}
           <div>
             <label className="block text-xs font-semibold text-[#E89BA8] mb-1.5">
               Memo / Notes (Optional)
             </label>
             <input 
               type="text"
-              placeholder="e.g. Tax deductible expense, quarterly bonus"
+              placeholder="e.g. Tax deductible, family dinner, investment tranche"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-[#1C060D] border border-[#3D1421] rounded-xl text-xs text-[#FDFBF7] placeholder:text-[#6E555C] focus:outline-hidden focus:ring-1 focus:ring-[#DFB27A]"
@@ -275,7 +310,7 @@ export default function TransactionModal({ isOpen, onClose, onAddTransaction }) 
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#DFB27A] to-[#E89BA8] text-[#230811] font-bold text-xs shadow-lg hover:opacity-95 transition-all"
             >
               <Check className="w-4 h-4" />
-              <span>Record Transaction</span>
+              <span>{editingTransaction ? 'Save Changes' : 'Record Transaction'}</span>
             </button>
           </div>
         </form>
