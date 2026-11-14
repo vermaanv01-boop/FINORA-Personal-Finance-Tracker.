@@ -1,34 +1,56 @@
 import { useState, useEffect, useMemo } from 'react';
-import { INITIAL_TRANSACTIONS, CATEGORY_COLORS, CATEGORY_ICONS } from '../data/sampleData';
-
-const TRANSACTIONS_KEY = 'finora_transactions_v3';
-const SETTINGS_KEY = 'finora_settings_v3';
+import { CATEGORY_COLORS, CATEGORY_ICONS } from '../data/sampleData';
+import { useAuth } from '../context/AuthContext';
 
 const DEFAULT_SETTINGS = {
   currency: 'INR',
-  monthlyBudgetLimit: 175000,
+  monthlyBudgetLimit: 100000,
   emailAlerts: true
 };
 
 export function useFinanceData() {
-  // 1. Transactions state with localStorage fallback
+  const { currentUser } = useAuth();
+  
+  // Use a user-scoped storage key so each account has isolated financial data
+  const userKey = currentUser?.id || currentUser?.email || 'guest';
+  const transactionsKey = `finora_transactions_${userKey}`;
+  const settingsKey = `finora_settings_${userKey}`;
+
+  // 1. Transactions state - starts EMPTY for any new user
   const [transactions, setTransactions] = useState(() => {
     try {
-      const saved = localStorage.getItem(TRANSACTIONS_KEY);
+      const saved = localStorage.getItem(transactionsKey);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) {
       console.warn('Failed reading transactions from localStorage', e);
     }
-    return INITIAL_TRANSACTIONS;
+    return [];
   });
+
+  // Re-sync transactions if current user changes (e.g. login / switch account)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(transactionsKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setTransactions(parsed);
+          return;
+        }
+      }
+      setTransactions([]);
+    } catch (e) {
+      setTransactions([]);
+    }
+  }, [transactionsKey]);
 
   // 2. Settings state (currency, budget, alerts)
   const [settings, setSettings] = useState(() => {
     try {
-      const saved = localStorage.getItem(SETTINGS_KEY);
+      const saved = localStorage.getItem(settingsKey);
       if (saved) return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
     } catch (e) {
       console.warn('Failed reading settings from localStorage', e);
@@ -36,23 +58,36 @@ export function useFinanceData() {
     return DEFAULT_SETTINGS;
   });
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(settingsKey);
+      if (saved) {
+        setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(saved) });
+      } else {
+        setSettings(DEFAULT_SETTINGS);
+      }
+    } catch (e) {
+      setSettings(DEFAULT_SETTINGS);
+    }
+  }, [settingsKey]);
+
   // Persist transactions whenever updated
   useEffect(() => {
     try {
-      localStorage.setItem(TRANSACTIONS_KEY, JSON.stringify(transactions));
+      localStorage.setItem(transactionsKey, JSON.stringify(transactions));
     } catch (e) {
       console.warn('Failed to write transactions to localStorage', e);
     }
-  }, [transactions]);
+  }, [transactions, transactionsKey]);
 
   // Persist settings whenever updated
   useEffect(() => {
     try {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+      localStorage.setItem(settingsKey, JSON.stringify(settings));
     } catch (e) {
       console.warn('Failed to write settings to localStorage', e);
     }
-  }, [settings]);
+  }, [settings, settingsKey]);
 
   // 3. Dynamic Financial Calculations derived strictly from `transactions`
   const calculations = useMemo(() => {
@@ -85,20 +120,19 @@ export function useFinanceData() {
 
     const totalBalance = totalIncome - totalExpenses;
     const netSavings = totalIncome - totalExpenses;
-    const savingsRate = totalIncome > 0 ? ((netSavings / totalIncome) * 100).toFixed(1) : '0';
+    const savingsRate = totalIncome > 0 ? ((netSavings / totalIncome) * 100).toFixed(1) : '0.0';
     const totalTransactionsCount = transactions.length;
 
-    // Build Monthly Trend (Sorted chronologically, at least last 6 months)
+    // Build Monthly Trend (Sorted chronologically from actual transactions)
     const sortedMonthKeys = Object.keys(monthlyMap).sort();
     const monthsName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    // Provide robust 6-month comparative series
     let monthlyExpensesTrend = [];
     let incomeVsExpenses = [];
 
     if (sortedMonthKeys.length > 0) {
       monthlyExpensesTrend = sortedMonthKeys.map((key) => {
-        const [y, m] = key.split('-');
+        const [, m] = key.split('-');
         const name = `${monthsName[parseInt(m, 10) - 1]}`;
         const exp = monthlyMap[key].expenses;
         return {
@@ -110,7 +144,7 @@ export function useFinanceData() {
       });
 
       incomeVsExpenses = sortedMonthKeys.map((key) => {
-        const [y, m] = key.split('-');
+        const [, m] = key.split('-');
         const name = `${monthsName[parseInt(m, 10) - 1]}`;
         return {
           month: name,
@@ -127,7 +161,7 @@ export function useFinanceData() {
       return {
         name: catName,
         value: val,
-        color: CATEGORY_COLORS[catName] || '#DFB27A',
+        color: CATEGORY_COLORS[catName] || '#4A1025',
         percentage: Number(pct)
       };
     }).sort((a, b) => b.value - a.value);
@@ -148,22 +182,18 @@ export function useFinanceData() {
     });
 
     // Spending breakdown
-    const essentialSpending = Math.round(totalExpenses * 0.48);
-    const discretionarySpending = Math.round(totalExpenses * 0.32);
+    const essentialSpending = Math.round(totalExpenses * 0.5);
+    const discretionarySpending = Math.round(totalExpenses * 0.3);
     const savingsAndInvestments = Math.max(totalExpenses - (essentialSpending + discretionarySpending), 0);
 
     return {
       kpis: {
-        totalBalance: Math.max(0, totalBalance),
-        balanceChange: '+14.8%',
+        totalBalance: totalBalance,
         totalIncome,
-        incomeChange: '+12.4%',
         totalExpenses,
-        expensesChange: '-3.2%',
         netSavings,
         savingsRate: `${savingsRate}%`,
-        totalTransactions: totalTransactionsCount,
-        transactionsChange: `+${transactions.filter(t => t.date && t.date.startsWith('2026-11')).length} this month`
+        totalTransactions: totalTransactionsCount
       },
       monthlyExpensesTrend,
       incomeVsExpenses,
@@ -204,12 +234,10 @@ export function useFinanceData() {
     setSettings((prev) => ({ ...prev, ...newSettings }));
   };
 
-  const resetToDefault = () => {
-    setTransactions(INITIAL_TRANSACTIONS);
-    setSettings(DEFAULT_SETTINGS);
+  const clearAllTransactions = () => {
+    setTransactions([]);
     try {
-      localStorage.removeItem(TRANSACTIONS_KEY);
-      localStorage.removeItem(SETTINGS_KEY);
+      localStorage.removeItem(transactionsKey);
     } catch (e) {
       console.warn(e);
     }
@@ -224,6 +252,6 @@ export function useFinanceData() {
     updateTransaction,
     deleteTransaction,
     updateSettings,
-    resetToDefault
+    clearAllTransactions
   };
 }
