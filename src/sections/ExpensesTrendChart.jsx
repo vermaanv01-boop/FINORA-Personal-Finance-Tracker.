@@ -8,11 +8,11 @@ import {
   Tooltip, 
   CartesianGrid 
 } from 'recharts';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, PlusCircle, TrendingUp } from 'lucide-react';
 import { formatCurrency, formatCompactCurrency } from '../utils/currency';
 import { useTheme } from '../context/ThemeContext';
 
-export default function ExpensesTrendChart({ data, currency = 'INR' }) {
+export default function ExpensesTrendChart({ data = [], currency = 'INR', onOpenAddModal }) {
   const { isDark } = useTheme();
   const [timeRange, setTimeRange] = useState('all');
 
@@ -28,7 +28,7 @@ export default function ExpensesTrendChart({ data, currency = 'INR' }) {
             : 'bg-[#FFFFFF] border-[#E8E2E4] text-[#260814]'
           }
         `}>
-          <p className="font-semibold mb-1">{label} Month</p>
+          <p className="font-semibold mb-1">{label}</p>
           <div className="space-y-1">
             <p className="flex items-center justify-between gap-4">
               <span>Actual Spend:</span>
@@ -36,7 +36,7 @@ export default function ExpensesTrendChart({ data, currency = 'INR' }) {
             </p>
             {payload[1] && (
               <p className="flex items-center justify-between gap-4 opacity-75">
-                <span>Planned Cap:</span>
+                <span>Monthly Cap:</span>
                 <span className="font-mono">{formatCurrency(payload[1].value, currency)}</span>
               </p>
             )}
@@ -53,7 +53,7 @@ export default function ExpensesTrendChart({ data, currency = 'INR' }) {
 
   return (
     <div className={`
-      border rounded-2xl p-6 shadow-xl flex flex-col justify-between transition-colors
+      border rounded-2xl p-6 shadow-sm flex flex-col justify-between transition-colors min-h-[360px]
       ${isDark 
         ? 'bg-[#260814] border-[#360B1C] text-[#FFFFFF]' 
         : 'bg-[#FFFFFF] border-[#E8E2E4] text-[#260814]'
@@ -69,41 +69,60 @@ export default function ExpensesTrendChart({ data, currency = 'INR' }) {
             </h3>
           </div>
           <p className="text-xs opacity-75 mt-1">
-            Dynamic calculated outflow patterns from actual postings
+            Historical outflow patterns calculated from actual postings
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          <div className={`p-1 rounded-xl border flex items-center gap-1 ${isDark ? 'bg-[#360B1C] border-[#52152C]' : 'bg-[#F8F7F7] border-[#E8E2E4]'}`}>
-            <button
-              onClick={() => setTimeRange('recent')}
-              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-                timeRange === 'recent' 
-                  ? isDark ? 'bg-[#FFFFFF] text-[#260814]' : 'bg-[#4A1025] text-[#FFFFFF]' 
-                  : 'opacity-70 hover:opacity-100'
-              }`}
-            >
-              Recent
-            </button>
-            <button
-              onClick={() => setTimeRange('all')}
-              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-                timeRange === 'all' 
-                  ? isDark ? 'bg-[#FFFFFF] text-[#260814]' : 'bg-[#4A1025] text-[#FFFFFF]' 
-                  : 'opacity-70 hover:opacity-100'
-              }`}
-            >
-              All Months
-            </button>
+        {data.length > 0 && (
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <div className={`p-1 rounded-xl border flex items-center gap-1 ${isDark ? 'bg-[#360B1C] border-[#52152C]' : 'bg-[#F8F7F7] border-[#E8E2E4]'}`}>
+              <button
+                onClick={() => setTimeRange('recent')}
+                className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                  timeRange === 'recent' 
+                    ? isDark ? 'bg-[#FFFFFF] text-[#260814]' : 'bg-[#4A1025] text-[#FFFFFF]' 
+                    : 'opacity-70 hover:opacity-100'
+                }`}
+              >
+                Recent
+              </button>
+              <button
+                onClick={() => setTimeRange('all')}
+                className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                  timeRange === 'all' 
+                    ? isDark ? 'bg-[#FFFFFF] text-[#260814]' : 'bg-[#4A1025] text-[#FFFFFF]' 
+                    : 'opacity-70 hover:opacity-100'
+                }`}
+              >
+                All Months
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Chart container */}
-      <div className="h-64 sm:h-72 w-full">
+      {/* Chart container or Proper Empty State */}
+      <div className="h-64 sm:h-72 w-full flex items-center justify-center">
         {filteredData.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-xs opacity-60">
-            No expense trend data available. Add transactions to generate graph.
+          <div className="text-center p-6 max-w-sm flex flex-col items-center">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-3 ${isDark ? 'bg-[#360B1C] text-[#FFFFFF]' : 'bg-[#F8F7F7] text-[#4A1025]'}`}>
+              <TrendingUp className="w-6 h-6 opacity-60" />
+            </div>
+            <h4 className="font-serif font-bold text-base mb-1">No Expense Trend Recorded Yet</h4>
+            <p className="text-xs opacity-75 leading-relaxed mb-4">
+              Once you record monthly expenses, FINORA will plot your outflow trajectory against budget caps here.
+            </p>
+            {onOpenAddModal && (
+              <button
+                onClick={onOpenAddModal}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer ${
+                  isDark ? 'bg-[#FFFFFF] text-[#260814] hover:bg-[#F8F7F7]' : 'bg-[#4A1025] text-[#FFFFFF] hover:bg-[#5E142F]'
+                }`}
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>Add First Transaction</span>
+              </button>
+            )}
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
@@ -167,7 +186,11 @@ export default function ExpensesTrendChart({ data, currency = 'INR' }) {
         </div>
         <div className={`text-[11px] font-medium px-2.5 py-1 rounded-lg border flex items-center gap-1.5 ${isDark ? 'bg-[#360B1C] border-[#52152C] text-[#FFFFFF]' : 'bg-[#F8F7F7] border-[#E8E2E4] text-[#4A1025]'}`}>
           <Sparkles className="w-3 h-3" />
-          <span>Average monthly outflow: {formatCurrency(avgExpense, currency, false)}</span>
+          <span>
+            {data.length > 0 
+              ? `Average monthly outflow: ${formatCurrency(avgExpense, currency, false)}` 
+              : 'Awaiting transactions'}
+          </span>
         </div>
       </div>
     </div>
