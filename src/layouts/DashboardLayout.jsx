@@ -45,8 +45,8 @@ export default function DashboardLayout() {
 
   return (
     <div className={`
-      min-h-screen flex flex-col lg:flex-row antialiased transition-colors duration-300 selection:bg-[#E89BA8]/30
-      ${isDark ? 'bg-[#0F0307] text-[#FDFBF7]' : 'bg-[#FDFBF7] text-[#1F2937]'}
+      min-h-screen flex flex-col lg:flex-row antialiased transition-colors duration-300 selection:bg-[#4A1025] selection:text-[#FFFFFF]
+      ${isDark ? 'bg-[#260814] text-[#FFFFFF]' : 'bg-[#FFFFFF] text-[#260814]'}
     `}>
       {/* Sidebar Navigation */}
       <Sidebar 
@@ -79,12 +79,12 @@ export default function DashboardLayout() {
         <footer className={`
           border-t py-4 px-6 sm:px-8 text-xs flex flex-col sm:flex-row items-center justify-between gap-2 transition-colors
           ${isDark 
-            ? 'border-[#38111E] bg-[#0F0307] text-[#A89299]' 
-            : 'border-[#EADDCD] bg-[#FDFBF7] text-[#8C7A80]'
+            ? 'border-[#360B1C] bg-[#260814] text-[#FFFFFF]/60' 
+            : 'border-[#E8E2E4] bg-[#FFFFFF] text-[#260814]/70'
           }
         `}>
           <div className="flex items-center gap-2">
-            <span className="font-serif font-bold text-[#230811] dark:text-[#FDFBF7]">FINORA</span>
+            <span className={`font-serif font-bold ${isDark ? 'text-[#FFFFFF]' : 'text-[#4A1025]'}`}>FINORA</span>
             <span>• Personal Wealth Intelligence Platform</span>
           </div>
           <p>© 2026 FINORA. LocalStorage Persistence Active • Default INR (₹)</p>
@@ -102,4 +102,3 @@ export default function DashboardLayout() {
     </div>
   );
 }
-
