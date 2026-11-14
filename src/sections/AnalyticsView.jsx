@@ -4,7 +4,9 @@ import {
   Award, 
   Percent, 
   ShieldAlert, 
-  Sparkles 
+  Sparkles,
+  BarChart3,
+  PlusCircle
 } from 'lucide-react';
 import ExpensesTrendChart from './ExpensesTrendChart';
 import IncomeVsExpensesChart from './IncomeVsExpensesChart';
@@ -13,20 +15,23 @@ import { formatCurrency } from '../utils/currency';
 import { useTheme } from '../context/ThemeContext';
 
 export default function AnalyticsView({ 
-  monthlyExpensesTrend, 
-  incomeVsExpenses, 
-  categoryExpenses,
+  monthlyExpensesTrend = [], 
+  incomeVsExpenses = [], 
+  categoryExpenses = [], 
   kpis,
-  currency = 'INR' 
+  currency = 'INR',
+  onOpenAddModal
 }) {
   const { isDark } = useTheme();
 
   const metrics = [
-    { label: 'Savings Efficiency Rate', val: kpis?.savingsRate || '0%', change: 'Calculated from Net Margin', icon: Percent },
-    { label: 'Total Inflow Velocity', val: formatCurrency(kpis?.totalIncome || 0, currency, false), change: 'Gross realized revenue', icon: TrendingUp },
+    { label: 'Savings Efficiency Rate', val: kpis?.savingsRate || '0.0%', change: 'Calculated from Net Margin', icon: Percent },
+    { label: 'Total Inflow Velocity', val: formatCurrency(kpis?.totalIncome || 0, currency, false), change: 'Gross verified inflows', icon: TrendingUp },
     { label: 'Total Capital Disbursed', val: formatCurrency(kpis?.totalExpenses || 0, currency, false), change: 'Strictly ledger audited', icon: ShieldAlert },
-    { label: 'Retained Net Capital', val: formatCurrency(kpis?.netSavings || 0, currency, false), change: 'Liquid surplus reserve', icon: Award }
+    { label: 'Retained Net Capital', val: formatCurrency(kpis?.netSavings || 0, currency, false), change: 'Liquid surplus balance', icon: Award }
   ];
+
+  const hasData = (kpis?.totalTransactions || 0) > 0;
 
   return (
     <div className="space-y-6">
@@ -45,7 +50,7 @@ export default function AnalyticsView({
           </div>
           <h2 className="font-serif text-2xl font-bold">Financial Analytics & Intelligence</h2>
           <p className="text-xs opacity-80 mt-1 max-w-xl leading-relaxed">
-            Dynamic capital trends, expenditure concentrations, and live portfolio retention modeling in White & Burgundy.
+            Dynamic capital trends, expenditure concentrations, and live portfolio retention calculated strictly from user transactions.
           </p>
         </div>
       </div>
@@ -57,7 +62,7 @@ export default function AnalyticsView({
           return (
             <div 
               key={m.label} 
-              className={`p-5 rounded-2xl border shadow-lg transition-colors ${
+              className={`p-5 rounded-2xl border shadow-sm transition-colors ${
                 isDark 
                   ? 'bg-[#260814] border-[#360B1C] text-[#FFFFFF]' 
                   : 'bg-[#FFFFFF] border-[#E8E2E4] text-[#260814]'
@@ -78,15 +83,27 @@ export default function AnalyticsView({
 
       {/* Main Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ExpensesTrendChart data={monthlyExpensesTrend} currency={currency} />
-        <IncomeVsExpensesChart data={incomeVsExpenses} currency={currency} />
+        <ExpensesTrendChart 
+          data={monthlyExpensesTrend} 
+          currency={currency} 
+          onOpenAddModal={onOpenAddModal} 
+        />
+        <IncomeVsExpensesChart 
+          data={incomeVsExpenses} 
+          currency={currency} 
+          onOpenAddModal={onOpenAddModal} 
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
-          <CategoryDonutChart data={categoryExpenses} currency={currency} />
+          <CategoryDonutChart 
+            data={categoryExpenses} 
+            currency={currency} 
+            onOpenAddModal={onOpenAddModal} 
+          />
         </div>
-        <div className={`lg:col-span-2 border rounded-2xl p-6 shadow-xl flex flex-col justify-between transition-colors ${
+        <div className={`lg:col-span-2 border rounded-2xl p-6 shadow-sm flex flex-col justify-between transition-colors ${
           isDark 
             ? 'bg-[#260814] border-[#360B1C] text-[#FFFFFF]' 
             : 'bg-[#FFFFFF] border-[#E8E2E4] text-[#260814]'
@@ -97,37 +114,65 @@ export default function AnalyticsView({
               <h3 className="font-serif font-bold text-lg">Strategic Wealth Projections</h3>
             </div>
             <p className="text-xs opacity-75 mb-5">
-              Based on your steady savings velocity ({kpis?.savingsRate}) and disciplined allocations:
+              Based on your actual savings velocity ({kpis?.savingsRate || '0.0%'}) and disciplined allocations:
             </p>
 
-            <div className="space-y-4">
-              <div className={`p-4 rounded-xl border ${isDark ? 'bg-[#360B1C] border-[#52152C]' : 'bg-[#F8F7F7] border-[#E8E2E4]'}`}>
-                <div className="flex justify-between items-center text-xs mb-1">
-                  <span className="font-semibold">12-Month Projected Net Savings</span>
-                  <span className="font-mono font-bold">
-                    {formatCurrency((kpis?.netSavings || 0) * 1.8, currency, false)} (+180%)
-                  </span>
+            {hasData ? (
+              <div className="space-y-4">
+                <div className={`p-4 rounded-xl border ${isDark ? 'bg-[#360B1C] border-[#52152C]' : 'bg-[#F8F7F7] border-[#E8E2E4]'}`}>
+                  <div className="flex justify-between items-center text-xs mb-1">
+                    <span className="font-semibold">12-Month Projected Net Savings</span>
+                    <span className="font-mono font-bold">
+                      {formatCurrency(Math.max((kpis?.netSavings || 0) * 1.5, 0), currency, false)}
+                    </span>
+                  </div>
+                  <div className={`w-full h-2 rounded-full mt-2 overflow-hidden ${isDark ? 'bg-[#260814]' : 'bg-[#E8E2E4]'}`}>
+                    <div className={`h-full rounded-full ${isDark ? 'bg-[#FFFFFF]' : 'bg-[#4A1025]'}`} style={{ width: '65%' }} />
+                  </div>
                 </div>
-                <div className={`w-full h-2 rounded-full mt-2 overflow-hidden ${isDark ? 'bg-[#260814]' : 'bg-[#E8E2E4]'}`}>
-                  <div className={`h-full rounded-full ${isDark ? 'bg-[#FFFFFF]' : 'bg-[#4A1025]'}`} style={{ width: '74%' }} />
-                </div>
-              </div>
 
-              <div className={`p-4 rounded-xl border ${isDark ? 'bg-[#360B1C] border-[#52152C]' : 'bg-[#F8F7F7] border-[#E8E2E4]'}`}>
-                <div className="flex justify-between items-center text-xs mb-1">
-                  <span className="font-semibold">Emergency Liquidity Reserve Target</span>
-                  <span className="font-mono font-bold">100% Fully Funded</span>
-                </div>
-                <div className={`w-full h-2 rounded-full mt-2 overflow-hidden ${isDark ? 'bg-[#260814]' : 'bg-[#E8E2E4]'}`}>
-                  <div className={`h-full rounded-full ${isDark ? 'bg-[#FFFFFF]' : 'bg-[#4A1025]'}`} style={{ width: '100%' }} />
+                <div className={`p-4 rounded-xl border ${isDark ? 'bg-[#360B1C] border-[#52152C]' : 'bg-[#F8F7F7] border-[#E8E2E4]'}`}>
+                  <div className="flex justify-between items-center text-xs mb-1">
+                    <span className="font-semibold">Emergency Liquidity Reserve Target</span>
+                    <span className="font-mono font-bold">
+                      {kpis?.totalBalance > 0 ? 'Active Reserve Accumulation' : 'Pending Inflows'}
+                    </span>
+                  </div>
+                  <div className={`w-full h-2 rounded-full mt-2 overflow-hidden ${isDark ? 'bg-[#260814]' : 'bg-[#E8E2E4]'}`}>
+                    <div 
+                      className={`h-full rounded-full ${isDark ? 'bg-[#FFFFFF]' : 'bg-[#4A1025]'}`} 
+                      style={{ width: `${Math.min(Math.max((kpis?.totalBalance || 0) / 1000, 5), 100)}%` }} 
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="py-8 px-4 text-center">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 ${isDark ? 'bg-[#360B1C] text-[#FFFFFF]' : 'bg-[#F8F7F7] text-[#4A1025]'}`}>
+                  <BarChart3 className="w-6 h-6 opacity-60" />
+                </div>
+                <h4 className="font-serif font-bold text-base mb-1">No Wealth Projections Available</h4>
+                <p className="text-xs opacity-75 max-w-sm mx-auto mb-4 leading-relaxed">
+                  Wealth projections are calculated strictly from your recorded cash flows. Enter your transactions to begin forecasting.
+                </p>
+                {onOpenAddModal && (
+                  <button
+                    onClick={onOpenAddModal}
+                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer ${
+                      isDark ? 'bg-[#FFFFFF] text-[#260814] hover:bg-[#F8F7F7]' : 'bg-[#4A1025] text-[#FFFFFF] hover:bg-[#5E142F]'
+                    }`}
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    <span>Record Entry</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           <div className={`pt-4 mt-6 border-t text-xs opacity-75 flex items-center justify-between ${isDark ? 'border-[#360B1C]' : 'border-[#E8E2E4]'}`}>
-            <span>Model: Live Multi-Account Cash Velocity</span>
-            <span className="font-semibold">Q4 Verified</span>
+            <span>Model: Ledger Cash Velocity</span>
+            <span className="font-semibold">{hasData ? 'Live Calculated' : 'Idle'}</span>
           </div>
         </div>
       </div>
