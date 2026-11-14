@@ -1,16 +1,16 @@
 // Initial sample financial transactions for FINORA in INR (₹)
-// Formatted according to realistic Indian urban lifestyle & wealth management
+// Pure White & Burgundy Design System
 
 export const INITIAL_TRANSACTIONS = [
   {
     id: 'tx-101',
-    title: 'Client Retainer - FinTech Advisory',
+    title: 'Client Retainer - Executive Advisory',
     category: 'Consulting Income',
     type: 'income',
     amount: 175000,
     date: '2026-11-14',
     status: 'Cleared',
-    account: 'HDFC Imperia •• 4910',
+    account: 'Private Banking •• 4910',
     icon: 'ArrowDownLeft',
     notes: 'Q4 advisory retainer payment'
   },
@@ -22,7 +22,7 @@ export const INITIAL_TRANSACTIONS = [
     amount: 45000,
     date: '2026-11-12',
     status: 'Completed',
-    account: 'HDFC Imperia •• 4910',
+    account: 'Private Banking •• 4910',
     icon: 'Home',
     notes: 'Monthly residence lease payment'
   },
@@ -34,7 +34,7 @@ export const INITIAL_TRANSACTIONS = [
     amount: 35000,
     date: '2026-11-10',
     status: 'Completed',
-    account: 'Zerodha Demat •• 8821',
+    account: 'Wealth Demat •• 8821',
     icon: 'TrendingUp',
     notes: 'Automated disciplined equity SIP'
   },
@@ -46,7 +46,7 @@ export const INITIAL_TRANSACTIONS = [
     amount: 8650,
     date: '2026-11-08',
     status: 'Completed',
-    account: 'Infinia Metal •• 8842',
+    account: 'Burgundy Signature •• 8842',
     icon: 'Utensils',
     notes: 'Family dinner celebration'
   },
@@ -58,108 +58,109 @@ export const INITIAL_TRANSACTIONS = [
     amount: 24500,
     date: '2026-11-06',
     status: 'Cleared',
-    account: 'ICICI Wealth •• 3011',
+    account: 'Wealth Reserve •• 3011',
     icon: 'TrendingUp',
     notes: 'Interim dividend yield credited'
   },
   {
     id: 'tx-106',
-    title: 'Air India Club Vistara Business Flights',
+    title: 'Club Vistara Executive Business Flights',
     category: 'Transport & Travel',
     type: 'expense',
     amount: 22400,
     date: '2026-11-04',
     status: 'Completed',
-    account: 'Infinia Metal •• 8842',
+    account: 'Burgundy Signature •• 8842',
     icon: 'Plane',
-    notes: 'Delhi to Mumbai return executive flight'
+    notes: 'Executive roundtrip flights'
   },
   {
     id: 'tx-107',
-    title: 'Nature Basket Gourmet Groceries',
+    title: 'Gourmet Organic Pantry Provisions',
     category: 'Food & Dining',
     type: 'expense',
     amount: 9800,
     date: '2026-11-02',
     status: 'Completed',
-    account: 'Infinia Metal •• 8842',
+    account: 'Burgundy Signature •• 8842',
     icon: 'Utensils',
-    notes: 'Weekly pantry & fresh supplies'
+    notes: 'Pantry provisions & groceries'
   },
   {
     id: 'tx-108',
-    title: 'Cult.fit & Wellness Club Membership',
+    title: 'Wellness & Fitness Club Membership',
     category: 'Healthcare & Wellness',
     type: 'expense',
     amount: 14500,
     date: '2026-10-28',
     status: 'Completed',
-    account: 'Infinia Metal •• 8842',
+    account: 'Burgundy Signature •• 8842',
     icon: 'Activity',
-    notes: 'Annual fitness and nutrition pass'
+    notes: 'Annual fitness and wellness access'
   },
   {
     id: 'tx-109',
-    title: 'Tata Power & High-Speed Fiber Broadband',
+    title: 'Utility Infrastructure & High-Speed Fiber',
     category: 'Utilities & Bills',
     type: 'expense',
     amount: 6200,
     date: '2026-10-24',
     status: 'Completed',
-    account: 'HDFC Imperia •• 4910',
+    account: 'Private Banking •• 4910',
     icon: 'Zap',
     notes: 'Utility bill clearance'
   },
   {
     id: 'tx-110',
-    title: 'Quarterly Executive Bonus',
+    title: 'Executive Performance Milestone Bonus',
     category: 'Salary & Bonus',
     type: 'income',
     amount: 120000,
     date: '2026-10-15',
     status: 'Cleared',
-    account: 'HDFC Imperia •• 4910',
+    account: 'Private Banking •• 4910',
     icon: 'ArrowDownLeft',
-    notes: 'Performance incentive payout'
+    notes: 'Quarterly bonus incentive payout'
   },
   {
     id: 'tx-111',
-    title: 'Apple BKC Store - iPad Pro M4',
+    title: 'Executive Workstation Upgrade',
     category: 'Entertainment & Leisure',
     type: 'expense',
     amount: 89900,
     date: '2026-10-08',
     status: 'Completed',
-    account: 'Infinia Metal •• 8842',
+    account: 'Burgundy Signature •• 8842',
     icon: 'Laptop',
-    notes: 'Productivity workstation upgrade'
+    notes: 'Productivity hardware upgrade'
   },
   {
     id: 'tx-112',
-    title: 'Sovereign Gold Bonds Coupon Payout',
+    title: 'Sovereign Bond Coupon Payout',
     category: 'Dividend & Yield',
     type: 'income',
     amount: 15800,
     date: '2026-09-22',
     status: 'Cleared',
-    account: 'ICICI Wealth •• 3011',
+    account: 'Wealth Reserve •• 3011',
     icon: 'TrendingUp',
-    notes: 'Half-yearly RBI bond interest'
+    notes: 'Half-yearly bond interest'
   }
 ];
 
+// White & Burgundy spectrum tones (Primary #4A1025, Deep #260814, White #FFFFFF)
 export const CATEGORY_COLORS = {
-  'Housing & Rent': '#E89BA8',
-  'Investments': '#DFB27A',
-  'Food & Dining': '#F7D6DC',
-  'Transport & Travel': '#B35467',
-  'Utilities & Bills': '#E4A564',
-  'Entertainment & Leisure': '#8A2D43',
-  'Healthcare & Wellness': '#5C1D2E',
-  'Salary & Bonus': '#34D399',
-  'Consulting Income': '#10B981',
-  'Dividend & Yield': '#6EE7B7',
-  'Other': '#A89299'
+  'Housing & Rent': '#4A1025',
+  'Investments': '#FFFFFF',
+  'Food & Dining': '#6B1735',
+  'Transport & Travel': '#8C2046',
+  'Utilities & Bills': '#AD2A58',
+  'Entertainment & Leisure': '#360B1C',
+  'Healthcare & Wellness': '#C73A6B',
+  'Salary & Bonus': '#FFFFFF',
+  'Consulting Income': '#F8F7F7',
+  'Dividend & Yield': '#E8E2E4',
+  'Other': '#7A1C3C'
 };
 
 export const CATEGORY_ICONS = {
