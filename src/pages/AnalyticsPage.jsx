@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import AnalyticsView from '../sections/AnalyticsView';
 
 export default function AnalyticsPage() {
-  const { finance, currency } = useOutletContext();
+  const { finance, currency, onOpenAddModal } = useOutletContext();
 
   return (
     <AnalyticsView 
@@ -12,7 +12,7 @@ export default function AnalyticsPage() {
       categoryExpenses={finance.categoryExpenses}
       kpis={finance.kpis}
       currency={currency}
+      onOpenAddModal={onOpenAddModal}
     />
   );
 }
-
