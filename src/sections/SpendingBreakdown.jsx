@@ -1,44 +1,41 @@
 import React from 'react';
-import { 
-  ShieldCheck, 
-  Layers, 
-  Target, 
-  ArrowUpRight, 
-  AlertCircle 
-} from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
+import { formatCurrency } from '../utils/currency';
 
-export default function SpendingBreakdown({ stats }) {
+export default function SpendingBreakdown({ stats, currency = 'INR' }) {
   const {
-    essentialSpending,
-    discretionarySpending,
-    savingsAndInvestments,
-    monthlyBudgetLimit,
-    totalSpentThisMonth
-  } = stats;
+    essentialSpending = 0,
+    discretionarySpending = 0,
+    savingsAndInvestments = 0,
+    monthlyBudgetLimit = 175000,
+    totalSpentThisMonth = 0
+  } = stats || {};
 
-  const budgetUsagePercent = Math.min(Math.round((totalSpentThisMonth / monthlyBudgetLimit) * 100), 100);
+  const budgetUsagePercent = monthlyBudgetLimit > 0 
+    ? Math.min(Math.round((totalSpentThisMonth / monthlyBudgetLimit) * 100), 100) 
+    : 0;
   const remainingBudget = Math.max(monthlyBudgetLimit - totalSpentThisMonth, 0);
 
   const breakdownSegments = [
     {
       title: 'Fixed & Essential Core',
       amount: essentialSpending,
-      desc: 'Housing, base utilities, debt service',
-      percentage: Math.round((essentialSpending / totalSpentThisMonth) * 100),
+      desc: 'Housing lease, utilities, insurance',
+      percentage: totalSpentThisMonth > 0 ? Math.round((essentialSpending / totalSpentThisMonth) * 100) : 0,
       color: '#E89BA8'
     },
     {
       title: 'Discretionary Lifestyle',
       amount: discretionarySpending,
-      desc: 'Dining, travel, luxury leisure',
-      percentage: Math.round((discretionarySpending / totalSpentThisMonth) * 100),
+      desc: 'Dining, travel, executive shopping',
+      percentage: totalSpentThisMonth > 0 ? Math.round((discretionarySpending / totalSpentThisMonth) * 100) : 0,
       color: '#DFB27A'
     },
     {
       title: 'Strategic Asset Allocation',
       amount: savingsAndInvestments,
-      desc: 'Equities, index funds, reserves',
-      percentage: Math.round((savingsAndInvestments / totalSpentThisMonth) * 100),
+      desc: 'Equities, index SIPs, reserves',
+      percentage: totalSpentThisMonth > 0 ? Math.round((savingsAndInvestments / totalSpentThisMonth) * 100) : 0,
       color: '#F7D6DC'
     }
   ];
@@ -56,7 +53,7 @@ export default function SpendingBreakdown({ stats }) {
               </h3>
             </div>
             <p className="text-xs text-[#E89BA8]/70 mt-1">
-              Monthly capital distribution vs disciplined thresholds
+              Live calculated capital distribution vs configured cap
             </p>
           </div>
           <div className="px-2.5 py-1 rounded-full bg-[#2E0D18] border border-[#481827] text-[11px] text-[#DFB27A] font-semibold">
@@ -69,7 +66,7 @@ export default function SpendingBreakdown({ stats }) {
           <div className="flex items-center justify-between text-xs mb-2">
             <span className="text-[#A89299]">Monthly Budget Envelope</span>
             <span className="font-mono text-[#FDFBF7] font-semibold">
-              ${totalSpentThisMonth.toLocaleString()} / <span className="text-[#A89299]">${monthlyBudgetLimit.toLocaleString()}</span>
+              {formatCurrency(totalSpentThisMonth, currency, false)} / <span className="text-[#A89299]">{formatCurrency(monthlyBudgetLimit, currency, false)}</span>
             </span>
           </div>
 
@@ -81,8 +78,8 @@ export default function SpendingBreakdown({ stats }) {
           </div>
 
           <div className="flex items-center justify-between mt-2.5 text-[11px] text-[#E89BA8]/70">
-            <span>Remaining Buffer: <strong className="text-[#34D399] font-mono">${remainingBudget.toLocaleString()}</strong></span>
-            <span>Target: &lt; 85% utilization</span>
+            <span>Remaining Buffer: <strong className="text-[#34D399] font-mono">{formatCurrency(remainingBudget, currency, false)}</strong></span>
+            <span>Target: &lt; 80% utilization</span>
           </div>
         </div>
 
@@ -99,7 +96,7 @@ export default function SpendingBreakdown({ stats }) {
                   <span className="text-xs font-semibold text-[#FDFBF7]">{seg.title}</span>
                 </div>
                 <div className="text-xs font-mono font-bold text-[#FDFBF7]">
-                  ${seg.amount.toLocaleString()} <span className="text-[10px] text-[#A89299] font-normal">({seg.percentage}%)</span>
+                  {formatCurrency(seg.amount, currency, false)} <span className="text-[10px] text-[#A89299] font-normal">({seg.percentage}%)</span>
                 </div>
               </div>
               <p className="text-[11px] text-[#A89299] pl-4">{seg.desc}</p>
@@ -119,4 +116,3 @@ export default function SpendingBreakdown({ stats }) {
     </div>
   );
 }
-
