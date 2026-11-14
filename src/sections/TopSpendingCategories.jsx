@@ -8,7 +8,9 @@ import {
   Laptop, 
   Activity, 
   ArrowDownLeft, 
-  CreditCard 
+  CreditCard,
+  PlusCircle,
+  Tag
 } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
 import { useTheme } from '../context/ThemeContext';
@@ -25,12 +27,12 @@ const iconMap = {
   CreditCard
 };
 
-export default function TopSpendingCategories({ categories, currency = 'INR' }) {
+export default function TopSpendingCategories({ categories = [], currency = 'INR', onOpenAddModal }) {
   const { isDark } = useTheme();
 
   return (
     <div className={`
-      border rounded-2xl p-6 shadow-xl flex flex-col justify-between transition-colors
+      border rounded-2xl p-6 shadow-sm flex flex-col justify-between transition-colors min-h-[360px]
       ${isDark 
         ? 'bg-[#260814] border-[#360B1C] text-[#FFFFFF]' 
         : 'bg-[#FFFFFF] border-[#E8E2E4] text-[#260814]'
@@ -47,7 +49,7 @@ export default function TopSpendingCategories({ categories, currency = 'INR' }) 
               </h3>
             </div>
             <p className="text-xs opacity-75 mt-1">
-              Primary outflows sorted by dynamic volume
+              Primary outflows ranked by volume
             </p>
           </div>
           <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg border ${isDark ? 'bg-[#360B1C] border-[#52152C] text-[#FFFFFF]' : 'bg-[#F8F7F7] border-[#E8E2E4] text-[#4A1025]'}`}>
@@ -55,11 +57,28 @@ export default function TopSpendingCategories({ categories, currency = 'INR' }) 
           </span>
         </div>
 
-        {/* Categories List */}
+        {/* Categories List or Proper Empty State */}
         <div className="space-y-4">
           {categories.length === 0 ? (
-            <div className="text-center py-8 text-xs opacity-60">
-              No expense categories recorded yet.
+            <div className="text-center py-10 px-4 flex flex-col items-center">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-3 ${isDark ? 'bg-[#360B1C] text-[#FFFFFF]' : 'bg-[#F8F7F7] text-[#4A1025]'}`}>
+                <Tag className="w-6 h-6 opacity-60" />
+              </div>
+              <h4 className="font-serif font-bold text-sm mb-1">No Categories Recorded</h4>
+              <p className="text-xs opacity-75 max-w-xs leading-relaxed mb-4">
+                When you record expenses, your top spending categories will be automatically calculated and ranked here.
+              </p>
+              {onOpenAddModal && (
+                <button
+                  onClick={onOpenAddModal}
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer ${
+                    isDark ? 'bg-[#FFFFFF] text-[#260814] hover:bg-[#F8F7F7]' : 'bg-[#4A1025] text-[#FFFFFF] hover:bg-[#5E142F]'
+                  }`}
+                >
+                  <PlusCircle className="w-3.5 h-3.5" />
+                  <span>Record Expense</span>
+                </button>
+              )}
             </div>
           ) : (
             categories.map((cat) => {
@@ -121,8 +140,10 @@ export default function TopSpendingCategories({ categories, currency = 'INR' }) 
 
       {/* Footer Info */}
       <div className={`mt-5 pt-3.5 border-t flex items-center justify-between text-xs ${isDark ? 'border-[#360B1C]' : 'border-[#E8E2E4]'}`}>
-        <span className="opacity-75">Portfolio Advisory Score</span>
-        <span className="font-serif font-bold">94/100 (Optimal)</span>
+        <span className="opacity-75">Category Ranking</span>
+        <span className="font-serif font-bold">
+          {categories.length > 0 ? `${categories.length} Categories Tracked` : 'Awaiting data'}
+        </span>
       </div>
     </div>
   );
