@@ -16,8 +16,8 @@ export default function KpiCards({ kpis, currency = 'INR' }) {
     {
       id: 'balance',
       title: 'Total Balance',
-      value: formatCurrency(kpis.totalBalance, currency),
-      subtitle: `${kpis.balanceChange} net change`,
+      value: formatCurrency(kpis?.totalBalance || 0, currency),
+      subtitle: (kpis?.totalTransactions || 0) === 0 ? 'No transactions yet' : 'Calculated Net Liquidity',
       icon: Wallet,
       badgeText: 'Net Liquidity',
       isPrimary: true
@@ -25,32 +25,32 @@ export default function KpiCards({ kpis, currency = 'INR' }) {
     {
       id: 'income',
       title: 'Total Income',
-      value: formatCurrency(kpis.totalIncome, currency),
-      subtitle: `${kpis.incomeChange} recorded inflow`,
+      value: formatCurrency(kpis?.totalIncome || 0, currency),
+      subtitle: (kpis?.totalIncome || 0) === 0 ? 'No income recorded' : 'Total Verified Inflows',
       icon: ArrowDownLeft,
       badgeText: 'Total Inflow'
     },
     {
       id: 'expenses',
       title: 'Total Expenses',
-      value: formatCurrency(kpis.totalExpenses, currency),
-      subtitle: `${kpis.expensesChange} budget discipline`,
+      value: formatCurrency(kpis?.totalExpenses || 0, currency),
+      subtitle: (kpis?.totalExpenses || 0) === 0 ? 'No expenses recorded' : 'Total Verified Outflows',
       icon: ArrowUpRight,
       badgeText: 'Total Outflow'
     },
     {
       id: 'savings',
       title: 'Net Savings',
-      value: formatCurrency(kpis.netSavings, currency),
-      subtitle: `Savings rate ${kpis.savingsRate}`,
+      value: formatCurrency(kpis?.netSavings || 0, currency),
+      subtitle: `Savings rate: ${kpis?.savingsRate || '0.0%'}`,
       icon: PiggyBank,
       badgeText: 'Retained Cash'
     },
     {
       id: 'transactions',
       title: 'Total Transactions',
-      value: kpis.totalTransactions,
-      subtitle: kpis.transactionsChange,
+      value: kpis?.totalTransactions || 0,
+      subtitle: (kpis?.totalTransactions || 0) === 0 ? 'Ledger empty' : `${kpis.totalTransactions} recorded entries`,
       icon: ReceiptText,
       badgeText: 'Ledger Count'
     }
@@ -65,7 +65,7 @@ export default function KpiCards({ kpis, currency = 'INR' }) {
           <div
             key={card.id}
             className={`
-              relative rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 group overflow-hidden border shadow-lg
+              relative rounded-2xl p-5 transition-all duration-300 hover:-translate-y-0.5 group overflow-hidden border shadow-sm
               ${card.isPrimary
                 ? isDark 
                   ? 'bg-[#360B1C] text-[#FFFFFF] border-[#52152C]' 
@@ -76,12 +76,12 @@ export default function KpiCards({ kpis, currency = 'INR' }) {
               }
             `}
           >
-            <div className="flex items-center justify-between mb-3.5">
+            <div className="flex items-center justify-between mb-3">
               <span className={`text-[11px] font-semibold tracking-wider uppercase ${card.isPrimary ? 'text-[#FFFFFF]/80' : isDark ? 'text-[#FFFFFF]/70' : 'text-[#4A1025]/80'}`}>
                 {card.title}
               </span>
               <div className={`
-                p-2 rounded-xl transition-transform duration-300 group-hover:scale-110
+                p-2 rounded-xl transition-transform duration-300 group-hover:scale-105
                 ${card.isPrimary 
                   ? 'bg-[#FFFFFF] text-[#4A1025]' 
                   : isDark 
@@ -93,8 +93,8 @@ export default function KpiCards({ kpis, currency = 'INR' }) {
               </div>
             </div>
 
-            <div className="mb-3">
-              <div className="text-2xl font-serif font-bold tracking-tight truncate">
+            <div className="mb-2.5">
+              <div className="text-xl sm:text-2xl font-serif font-bold tracking-tight truncate">
                 {card.value}
               </div>
             </div>
