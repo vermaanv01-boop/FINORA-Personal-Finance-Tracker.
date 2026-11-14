@@ -2,63 +2,57 @@ import React from 'react';
 import { 
   Wallet, 
   ArrowUpRight, 
-  ArrowDownRight, 
+  ArrowDownLeft, 
   PiggyBank, 
   ReceiptText 
 } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
+import { useTheme } from '../context/ThemeContext';
 
 export default function KpiCards({ kpis, currency = 'INR' }) {
+  const { isDark } = useTheme();
+
   const cards = [
     {
       id: 'balance',
       title: 'Total Balance',
       value: formatCurrency(kpis.totalBalance, currency),
       subtitle: `${kpis.balanceChange} net change`,
-      isPositive: true,
       icon: Wallet,
       badgeText: 'Net Liquidity',
-      variant: 'primary'
+      isPrimary: true
     },
     {
       id: 'income',
       title: 'Total Income',
       value: formatCurrency(kpis.totalIncome, currency),
       subtitle: `${kpis.incomeChange} recorded inflow`,
-      isPositive: true,
-      icon: ArrowDownRight,
-      badgeText: 'Total Inflow',
-      variant: 'maroon'
+      icon: ArrowDownLeft,
+      badgeText: 'Total Inflow'
     },
     {
       id: 'expenses',
       title: 'Total Expenses',
       value: formatCurrency(kpis.totalExpenses, currency),
       subtitle: `${kpis.expensesChange} budget discipline`,
-      isPositive: false,
       icon: ArrowUpRight,
-      badgeText: 'Total Outflow',
-      variant: 'maroon'
+      badgeText: 'Total Outflow'
     },
     {
       id: 'savings',
       title: 'Net Savings',
       value: formatCurrency(kpis.netSavings, currency),
       subtitle: `Savings rate ${kpis.savingsRate}`,
-      isPositive: true,
       icon: PiggyBank,
-      badgeText: 'Retained Cash',
-      variant: 'maroon'
+      badgeText: 'Retained Cash'
     },
     {
       id: 'transactions',
       title: 'Total Transactions',
       value: kpis.totalTransactions,
       subtitle: kpis.transactionsChange,
-      isPositive: true,
       icon: ReceiptText,
-      badgeText: 'Ledger Count',
-      variant: 'maroon'
+      badgeText: 'Ledger Count'
     }
   ];
 
@@ -66,45 +60,58 @@ export default function KpiCards({ kpis, currency = 'INR' }) {
     <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
       {cards.map((card) => {
         const Icon = card.icon;
-        const isPrimary = card.variant === 'primary';
         
         return (
           <div
             key={card.id}
             className={`
-              relative rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 group overflow-hidden
-              ${isPrimary 
-                ? 'bg-gradient-to-br from-[#2D0B16] via-[#230811] to-[#17040B] text-white shadow-xl shadow-[#2D0B16]/25 border border-[#4F192B]' 
-                : 'bg-[#230811] text-[#FDFBF7] shadow-lg shadow-[#15040a]/15 border border-[#3E1421] hover:border-[#6B2238]'
+              relative rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 group overflow-hidden border shadow-lg
+              ${card.isPrimary
+                ? isDark 
+                  ? 'bg-[#360B1C] text-[#FFFFFF] border-[#52152C]' 
+                  : 'bg-[#4A1025] text-[#FFFFFF] border-[#5E142F]'
+                : isDark
+                  ? 'bg-[#260814] text-[#FFFFFF] border-[#360B1C] hover:border-[#52152C]'
+                  : 'bg-[#FFFFFF] text-[#260814] border-[#E8E2E4] hover:border-[#4A1025]'
               }
             `}
           >
-            {/* Subtle glow effect */}
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#E89BA8]/10 via-transparent to-transparent rounded-bl-full pointer-events-none" />
-
             <div className="flex items-center justify-between mb-3.5">
-              <span className="text-[11px] font-semibold tracking-wider uppercase text-[#E89BA8]/80">
+              <span className={`text-[11px] font-semibold tracking-wider uppercase ${card.isPrimary ? 'text-[#FFFFFF]/80' : isDark ? 'text-[#FFFFFF]/70' : 'text-[#4A1025]/80'}`}>
                 {card.title}
               </span>
               <div className={`
                 p-2 rounded-xl transition-transform duration-300 group-hover:scale-110
-                ${isPrimary ? 'bg-[#3D1220] text-[#DFB27A]' : 'bg-[#2E0D18] text-[#E89BA8]'}
+                ${card.isPrimary 
+                  ? 'bg-[#FFFFFF] text-[#4A1025]' 
+                  : isDark 
+                    ? 'bg-[#360B1C] text-[#FFFFFF]' 
+                    : 'bg-[#F8F7F7] text-[#4A1025]'
+                }
               `}>
                 <Icon className="w-4 h-4" />
               </div>
             </div>
 
             <div className="mb-3">
-              <div className="text-2xl font-serif font-bold tracking-tight text-[#FDFBF7] truncate">
+              <div className="text-2xl font-serif font-bold tracking-tight truncate">
                 {card.value}
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-[#3D1421]/80 text-xs">
-              <span className="text-[11px] text-[#E89BA8]/70 truncate max-w-[130px]">
+            <div className={`flex items-center justify-between pt-2 border-t text-xs ${card.isPrimary ? 'border-[#FFFFFF]/15' : isDark ? 'border-[#360B1C]' : 'border-[#E8E2E4]'}`}>
+              <span className={`text-[11px] truncate max-w-[130px] ${card.isPrimary ? 'text-[#FFFFFF]/70' : isDark ? 'text-[#FFFFFF]/60' : 'text-[#260814]/70'}`}>
                 {card.subtitle}
               </span>
-              <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-[#2F0E1A] text-[#DFB27A] border border-[#DFB27A]/20">
+              <span className={`
+                text-[10px] font-semibold px-2 py-0.5 rounded-md border
+                ${card.isPrimary 
+                  ? 'bg-[#FFFFFF]/10 text-[#FFFFFF] border-[#FFFFFF]/20' 
+                  : isDark 
+                    ? 'bg-[#360B1C] text-[#FFFFFF] border-[#52152C]' 
+                    : 'bg-[#F8F7F7] text-[#4A1025] border-[#E8E2E4]'
+                }
+              `}>
                 {card.badgeText}
               </span>
             </div>
