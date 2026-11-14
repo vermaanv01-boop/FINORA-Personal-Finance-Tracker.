@@ -6,12 +6,13 @@ import {
   Cell, 
   Tooltip 
 } from 'recharts';
-import { PieChart as PieIcon, ArrowUpRight } from 'lucide-react';
+import { PieChart as PieIcon } from 'lucide-react';
+import { formatCurrency } from '../utils/currency';
 
-export default function CategoryDonutChart({ data }) {
+export default function CategoryDonutChart({ data, currency = 'INR' }) {
   const [activeIndex, setActiveIndex] = useState(null);
 
-  const total = data.reduce((acc, curr) => acc + curr.value, 0);
+  const total = data.reduce((acc, curr) => acc + (curr.value || 0), 0);
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
@@ -21,11 +22,11 @@ export default function CategoryDonutChart({ data }) {
           <p className="font-semibold text-[#DFB27A] mb-0.5">{item.name}</p>
           <div className="flex items-center justify-between gap-4">
             <span className="text-[#E89BA8]">Amount:</span>
-            <span className="font-bold font-mono">${item.value.toLocaleString()}</span>
+            <span className="font-bold font-mono">{formatCurrency(item.value, currency)}</span>
           </div>
           <div className="flex items-center justify-between gap-4 text-[#A89299] text-[11px]">
             <span>Share:</span>
-            <span>{((item.value / total) * 100).toFixed(1)}%</span>
+            <span>{total > 0 ? ((item.value / total) * 100).toFixed(1) : 0}%</span>
           </div>
         </div>
       );
@@ -45,7 +46,7 @@ export default function CategoryDonutChart({ data }) {
             </h3>
           </div>
           <p className="text-xs text-[#E89BA8]/70 mt-1">
-            Diversification of monthly disbursements
+            Dynamic distribution derived from live transactions
           </p>
         </div>
         <div className="p-2 rounded-xl bg-[#2D0B16] text-[#E89BA8] border border-[#3D1420]">
@@ -55,41 +56,47 @@ export default function CategoryDonutChart({ data }) {
 
       {/* Donut Chart with Center Label */}
       <div className="relative h-56 w-full flex items-center justify-center">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Tooltip content={<CustomTooltip />} />
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              innerRadius={65}
-              outerRadius={88}
-              paddingAngle={3}
-              dataKey="value"
-              onMouseEnter={(_, index) => setActiveIndex(index)}
-              onMouseLeave={() => setActiveIndex(null)}
-            >
-              {data.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={entry.color} 
-                  stroke="#230811" 
-                  strokeWidth={2}
-                  className="transition-all duration-300 hover:opacity-80 cursor-pointer"
-                />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
+        {data.length === 0 ? (
+          <div className="text-xs text-[#A89299]">No expense category data recorded yet</div>
+        ) : (
+          <>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Tooltip content={<CustomTooltip />} />
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={65}
+                  outerRadius={88}
+                  paddingAngle={3}
+                  dataKey="value"
+                  onMouseEnter={(_, index) => setActiveIndex(index)}
+                  onMouseLeave={() => setActiveIndex(null)}
+                >
+                  {data.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={entry.color} 
+                      stroke="#230811" 
+                      strokeWidth={2}
+                      className="transition-all duration-300 hover:opacity-80 cursor-pointer"
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
 
-        {/* Center Total Readout */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <span className="text-[10px] uppercase tracking-wider text-[#A89299] font-medium">Total Spend</span>
-          <span className="font-serif font-bold text-lg text-[#FDFBF7] mt-0.5">
-            ${total.toLocaleString()}
-          </span>
-          <span className="text-[10px] text-[#DFB27A]">100% Allocated</span>
-        </div>
+            {/* Center Total Readout */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span className="text-[10px] uppercase tracking-wider text-[#A89299] font-medium">Total Spend</span>
+              <span className="font-serif font-bold text-base sm:text-lg text-[#FDFBF7] mt-0.5 max-w-[120px] truncate text-center">
+                {formatCurrency(total, currency, false)}
+              </span>
+              <span className="text-[10px] text-[#DFB27A]">100% Calculated</span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Categories Legend List */}
@@ -114,4 +121,3 @@ export default function CategoryDonutChart({ data }) {
     </div>
   );
 }
-
