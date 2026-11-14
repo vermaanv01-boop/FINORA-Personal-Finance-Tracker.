@@ -104,3 +104,4 @@ export default function TopSpendingCategories({ categories }) {
     </div>
   );
 }
+

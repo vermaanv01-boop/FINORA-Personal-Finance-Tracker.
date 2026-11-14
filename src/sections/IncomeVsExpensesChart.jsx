@@ -119,3 +119,4 @@ export default function IncomeVsExpensesChart({ data }) {
     </div>
   );
 }
+

@@ -171,3 +171,4 @@ export const SPENDING_BREAKDOWN_STATS = {
   monthlyBudgetLimit: 7500,
   totalSpentThisMonth: 5820.50
 };
+
