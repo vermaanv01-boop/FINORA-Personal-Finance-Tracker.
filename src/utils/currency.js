@@ -58,3 +58,4 @@ export function formatCompactCurrency(amount, currencyCode = 'INR') {
   }
   return `${curr.symbol}${num}`;
 }
+
